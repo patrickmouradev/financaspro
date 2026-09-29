@@ -89,11 +89,11 @@
 - [x] 2.4.5 Criar `ExtratoService.java` (CRUD e resumos)
 
 ### 2.5 — Controllers & Relatórios
-- [ ] 2.5.1 Criar `ImportacaoController.java` (endpoints de importação e confirmação)
-- [ ] 2.5.2 Criar `ExtratoController.java` (CRUD, resumo mensal, relatórios PDF e Excel)
-- [ ] 2.5.3 Criar `CategoriaController.java` (CRUD de categorias e regras)
-- [ ] 2.5.4 Implementar exportação em `PdfGenerator.java` e `ExcelGenerator.java`
-- [ ] 2.5.5 Testes unitários do Módulo Extrato
+- [x] 2.5.1 Criar `ImportacaoController.java` (endpoints de importação e confirmação)
+- [x] 2.5.2 Criar `ExtratoController.java` (CRUD, resumo mensal, relatórios PDF e Excel)
+- [x] 2.5.3 Criar `CategoriaController.java` (CRUD de categorias e regras)
+- [x] 2.5.4 Implementar exportação em `PdfGenerator.java` e `ExcelGenerator.java`
+- [x] 2.5.5 Testes unitários do Módulo Extrato (`CategorizacaoServiceTest`)
 
 ---
 
