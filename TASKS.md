@@ -175,9 +175,9 @@
 ## ✅ FASE 7 — Finalização, Validação e Deploy
 
 ### 7.1 — Testes & QA Final
-- [ ] 7.1.1 Teste de integração de ponta a ponta (migração zero, login, importação real BTG, gráficos, exportação PDF/Excel)
-- [ ] 7.1.2 Testes de validação de Actuator `/actuator/health`
+- [x] 7.1.1 Teste de integração de ponta a ponta (migração zero, login, importação real BTG, gráficos, exportação PDF/Excel)
+- [x] 7.1.2 Testes de validação de Actuator `/actuator/health`
 
 ### 7.2 — Documentação e Deploy PRD
-- [ ] 7.2.1 Finalizar `README.md` com instruções de uso, ambiente e credenciais Jenkins
-- [ ] 7.2.2 Executar deploy via Jenkins em ambiente PRD e validar no Portainer
+- [x] 7.2.1 Finalizar `README.md` com instruções de uso, ambiente e credenciais Jenkins
+- [x] 7.2.2 Executar deploy via Jenkins em ambiente PRD e validar no Portainer
