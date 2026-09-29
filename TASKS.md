@@ -134,16 +134,16 @@
 ## 🏛️ FASE 5 — Módulo FIIs & Meta
 
 ### 5.1 — Entidades, DTOs e Services
-- [ ] 5.1.1 Criar entity `Fii.java` e `FiiRepository.java`
-- [ ] 5.1.2 Criar entity `Dividendo.java` e `DividendoRepository.java`
-- [ ] 5.1.3 Criar `DividendoBuilder.java`
-- [ ] 5.1.4 Criar `FiiDTO.java`, `DividendoDTO.java`, `MetaDTO.java`, `ProjecaoMetaDTO.java`
-- [ ] 5.1.5 Criar `FiiService.java` (gestão de FIIs e dividendos)
-- [ ] 5.1.6 Criar `MetaDividendoService.java` (cálculo de DY médio mensal, projeção de cotas faltantes, progresso da meta)
+- [x] 5.1.1 Criar entity `Fii.java` e `FiiRepository.java`
+- [x] 5.1.2 Criar entity `Dividendo.java` e `DividendoRepository.java`
+- [x] 5.1.3 Criar `DividendoBuilder.java` e `FiiBuilder.java`
+- [x] 5.1.4 Criar `FiiDTO.java`, `DividendoDTO.java`, `MetaDTO.java`, `ProjecaoMetaDTO.java`
+- [x] 5.1.5 Criar `FiiService.java` (gestão de FIIs e dividendos)
+- [x] 5.1.6 Criar `MetaDividendoService.java` (cálculo de DY médio mensal, projeção de cotas faltantes, progresso da meta)
 
 ### 5.2 — Controllers e Testes
-- [ ] 5.2.1 Criar `FiiController.java` e `DividendoController.java`
-- [ ] 5.2.2 Testes unitários do Módulo FIIs & Meta
+- [x] 5.2.1 Criar `FiiController.java` e `DividendoController.java`
+- [x] 5.2.2 Testes unitários do Módulo FIIs & Meta
 
 ---
 
