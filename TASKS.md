@@ -76,10 +76,10 @@
 - [x] 2.1.4 Criar entity `Lancamento.java` e `LancamentoRepository.java` (queries customizadas)
 
 ### 2.2 — Builders
-- [ ] 2.2.1 Criar `LancamentoBuilder.java`, `ContaBancariaBuilder.java`, `CategoriaBuilder.java`
+- [x] 2.2.1 Criar `LancamentoBuilder.java`, `ContaBancariaBuilder.java`, `CategoriaBuilder.java`, `RegraCategoriaBuilder.java`
 
 ### 2.3 — DTOs
-- [ ] 2.3.1 Criar `LancamentoDTO.java`, `ImportacaoResultadoDTO.java`, `ResumoMensalDTO.java`, `ContaBancariaDTO.java`, `CategoriaDTO.java`, `RegraCategoriaDTO.java`
+- [x] 2.3.1 Criar `LancamentoDTO.java`, `ImportacaoResultadoDTO.java`, `ResumoMensalDTO.java`, `CategoriaResumoDTO.java`, `ContaBancariaDTO.java`, `CategoriaDTO.java`, `RegraCategoriaDTO.java`
 
 ### 2.4 — Services & Parsers Específicos
 - [ ] 2.4.1 Criar `BtgFaturaParser.java` (parsing da fatura .xlsx com desproteção por senha)
