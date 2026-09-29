@@ -33,12 +33,12 @@
 - [x] 1.3.11 Validar execução das migrations Flyway via Maven (`mvn clean test-compile`)
 
 ### 1.4 — Package Utils
-- [ ] 1.4.1 Criar `utils/DateUtils.java` (anoMesAtual, calcularDiasEntre, formatarDataBr, primeiroEUltimoDiaMes)
-- [ ] 1.4.2 Criar `utils/MoedaUtils.java` (formatarReal, arredondar2Casas, somaBigDecimal)
-- [ ] 1.4.3 Criar `utils/PercentualUtils.java` (calcularVariacao, calcularPercentual, arredondar6Casas)
-- [ ] 1.4.4 Criar `utils/CsvExcelParser.java` (parsearArquivo, detectarFormato, mapearColunas, abrirComSenha com POIFS/EncryptionInfo)
-- [ ] 1.4.5 Criar `utils/PdfGenerator.java` (gerarRelatorio)
-- [ ] 1.4.6 Criar `utils/ExcelGenerator.java` (gerarPlanilha)
+- [x] 1.4.1 Criar `utils/DateUtils.java` (anoMesAtual, calcularDiasEntre, formatarDataBr, primeiroEUltimoDiaMes)
+- [x] 1.4.2 Criar `utils/MoedaUtils.java` (formatarReal, arredondar2Casas, somaBigDecimal)
+- [x] 1.4.3 Criar `utils/PercentualUtils.java` (calcularVariacao, calcularPercentual, arredondar6Casas)
+- [x] 1.4.4 Criar `utils/CsvExcelParser.java` (parsearArquivo, detectarFormato, mapearColunas, abrirComSenha com POIFS/EncryptionInfo)
+- [x] 1.4.5 Criar `utils/PdfGenerator.java` (gerarRelatorio)
+- [x] 1.4.6 Criar `utils/ExcelGenerator.java` (gerarPlanilha)
 
 ### 1.5 — Autenticação JWT
 - [ ] 1.5.1 Criar entity `Usuario.java` (id, nome, email, senhaHash, ativo)
