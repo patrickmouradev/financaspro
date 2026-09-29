@@ -50,12 +50,12 @@
 - [x] 1.5.7 Criar DTOs `LoginRequestDTO.java` e `TokenResponseDTO.java` e `UsuarioBuilder.java`
 
 ### 1.6 — Módulo Parâmetros de Sistema
-- [ ] 1.6.1 Criar entity `Parametro.java` (id, chave, valor, descricao, tipo)
-- [ ] 1.6.2 Criar `ParametroBuilder.java`
-- [ ] 1.6.3 Criar `ParametroRepository.java`
-- [ ] 1.6.4 Criar `ParametroService.java` (buscarPorChave, atualizar, listarTodos)
-- [ ] 1.6.5 Criar `ParametroController.java` (GET /api/parametros, PUT /api/parametros/{chave})
-- [ ] 1.6.6 Criar `ParametroDTO.java`
+- [x] 1.6.1 Criar entity `Parametro.java` (id, chave, valor, descricao, tipo)
+- [x] 1.6.2 Criar `ParametroBuilder.java`
+- [x] 1.6.3 Criar `ParametroRepository.java`
+- [x] 1.6.4 Criar `ParametroService.java` (buscarPorChave, atualizar, listarTodos)
+- [x] 1.6.5 Criar `ParametroController.java` (GET /api/parametros, PUT /api/parametros/{chave})
+- [x] 1.6.6 Criar `ParametroDTO.java`
 
 ### 1.7 — Docker e Jenkins (Fundação)
 - [ ] 1.7.1 Criar script/instrução de banco `CREATE DATABASE financaspro;` para o PostgreSQL 192.168.15.10
