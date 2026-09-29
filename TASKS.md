@@ -82,11 +82,11 @@
 - [x] 2.3.1 Criar `LancamentoDTO.java`, `ImportacaoResultadoDTO.java`, `ResumoMensalDTO.java`, `CategoriaResumoDTO.java`, `ContaBancariaDTO.java`, `CategoriaDTO.java`, `RegraCategoriaDTO.java`
 
 ### 2.4 — Services & Parsers Específicos
-- [ ] 2.4.1 Criar `BtgFaturaParser.java` (parsing da fatura .xlsx com desproteção por senha)
-- [ ] 2.4.2 Criar `BtgExtratoParser.java` (parsing do extrato conta corrente .xls)
-- [ ] 2.4.3 Criar `CategorizacaoService.java` (motor de categorização por palavra-chave)
-- [ ] 2.4.4 Criar `ImportacaoService.java` (processar preview e confirmar importação)
-- [ ] 2.4.5 Criar `ExtratoService.java` (CRUD e resumos)
+- [x] 2.4.1 Criar `BtgFaturaParser.java` (parsing da fatura .xlsx com desproteção por senha)
+- [x] 2.4.2 Criar `BtgExtratoParser.java` (parsing do extrato conta corrente .xls)
+- [x] 2.4.3 Criar `CategorizacaoService.java` (motor de categorização por palavra-chave)
+- [x] 2.4.4 Criar `ImportacaoService.java` (processar preview e confirmar importação)
+- [x] 2.4.5 Criar `ExtratoService.java` (CRUD e resumos)
 
 ### 2.5 — Controllers & Relatórios
 - [ ] 2.5.1 Criar `ImportacaoController.java` (endpoints de importação e confirmação)
