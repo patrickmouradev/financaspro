@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = 'financaspro-frontend'
+        PORT_HML = '3004'
+        PORT_PRD = '3003'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build & Lint') {
+            steps {
+                dir('frontend') {
+                    sh 'npm ci'
+                    sh 'npm run lint'
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('frontend') {
+                    sh "docker build -t ${APP_NAME}:${env.BUILD_NUMBER} ."
+                    sh "docker tag ${APP_NAME}:${env.BUILD_NUMBER} ${APP_NAME}:latest"
+                }
+            }
+        }
+
+        stage('Deploy HML') {
+            when {
+                branch 'master'
+            }
+            steps {
+                sh "docker stop ${APP_NAME}-hml || true"
+                sh "docker rm ${APP_NAME}-hml || true"
+                sh "docker run -d --name ${APP_NAME}-hml -p ${PORT_HML}:3004 -e NEXT_PUBLIC_API_URL=http://localhost:8087 ${APP_NAME}:latest"
+            }
+        }
+
+        stage('Deploy PRD') {
+            when {
+                branch 'production'
+            }
+            steps {
+                sh "docker stop ${APP_NAME}-prd || true"
+                sh "docker rm ${APP_NAME}-prd || true"
+                sh "docker run -d --name ${APP_NAME}-prd -p ${PORT_PRD}:3004 -e NEXT_PUBLIC_API_URL=http://localhost:8088 ${APP_NAME}:latest"
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

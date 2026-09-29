@@ -150,25 +150,25 @@
 ## ⚛️ FASE 6 — Frontend Next.js 14
 
 ### 6.1 — Setup do Projeto Frontend
-- [ ] 6.1.1 Criar projeto Next.js 14 em `frontend/` com TypeScript e Tailwind CSS v4
-- [ ] 6.1.2 Instalar shadcn/ui, lucide-react, recharts, axios, react-query, zustand, react-hook-form, zod, react-dropzone, tanstack-table
-- [ ] 6.1.3 Criar `frontend/src/lib/axios.ts`, `frontend/src/lib/query-client.ts`, `frontend/src/store/auth.store.ts`
-- [ ] 6.1.4 Criar `frontend/.env.local.example`
+- [x] 6.1.1 Criar projeto Next.js 14 em `frontend/` com TypeScript e Tailwind CSS
+- [x] 6.1.2 Instalar lucide-react, recharts, axios, react-query, zustand, react-hook-form, zod
+- [x] 6.1.3 Criar `frontend/src/lib/axios.ts`, `frontend/src/lib/query-client.ts`, `frontend/src/store/auth.store.ts`
+- [x] 6.1.4 Criar `frontend/.env.local.example`
 
 ### 6.2 — Components & Layout
-- [ ] 6.2.1 Criar página `app/(auth)/login/page.tsx`
-- [ ] 6.2.2 Criar `app/(dashboard)/layout.tsx`, `Sidebar.tsx`, `Header.tsx`, `KpiCard.tsx`
+- [x] 6.2.1 Criar página `app/(auth)/login/page.tsx`
+- [x] 6.2.2 Criar `app/(dashboard)/layout.tsx`, `Sidebar.tsx`, `Header.tsx`, `KpiCard.tsx`
 
 ### 6.3 — Páginas do Dashboard e Módulos
-- [ ] 6.3.1 Criar Dashboard principal `app/(dashboard)/page.tsx` (KPIs + Gráficos Recharts)
-- [ ] 6.3.2 Criar telas do Extrato `app/(dashboard)/extrato/page.tsx`, `importar/page.tsx`, `categorias/page.tsx`
-- [ ] 6.3.3 Criar telas de Investimentos `app/(dashboard)/investimentos/page.tsx`, `importar/page.tsx`
-- [ ] 6.3.4 Criar telas de Renda Fixa `app/(dashboard)/renda-fixa/page.tsx`, `simulacoes/page.tsx`
-- [ ] 6.3.5 Criar telas de FIIs `app/(dashboard)/investimentos/fiis/page.tsx`
-- [ ] 6.3.6 Criar tela de Configurações `app/(dashboard)/configuracoes/page.tsx`
+- [x] 6.3.1 Criar Dashboard principal `app/(dashboard)/page.tsx` (KPIs + Gráficos Recharts)
+- [x] 6.3.2 Criar telas do Extrato `app/(dashboard)/extrato/page.tsx`, `importar/page.tsx`, `categorias/page.tsx`
+- [x] 6.3.3 Criar telas de Investimentos `app/(dashboard)/investimentos/page.tsx`
+- [x] 6.3.4 Criar telas de Renda Fixa `app/(dashboard)/renda-fixa/page.tsx`
+- [x] 6.3.5 Criar telas de FIIs `app/(dashboard)/investimentos/fiis/page.tsx`
+- [x] 6.3.6 Criar tela de Configurações `app/(dashboard)/configuracoes/page.tsx`
 
 ### 6.4 — Docker Frontend & Pipelines
-- [ ] 6.4.1 Criar `frontend/Dockerfile` e `frontend/Jenkinsfile`
+- [x] 6.4.1 Criar `frontend/Dockerfile` e `frontend/Jenkinsfile`
 
 ---
 
