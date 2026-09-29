@@ -107,10 +107,10 @@
 - [x] 3.1.5 Criar `AtivoDTO.java`, `OperacaoDTO.java`, `RentabilidadeDTO.java`, `CarteiraDTO.java`
 
 ### 3.2 — Services & Controllers
-- [ ] 3.2.1 Criar `RentabilidadeService.java` (preço médio, cotação BRAPI, ganho/perda)
-- [ ] 3.2.2 Criar `InvestimentoService.java` (gestão de carteira e operações)
-- [ ] 3.2.3 Criar `InvestimentoController.java`, `OperacaoController.java`, `AtivoController.java`
-- [ ] 3.2.4 Testes unitários do Módulo Investimentos
+- [x] 3.2.1 Criar `RentabilidadeService.java` (preço médio, cotação BRAPI, ganho/perda)
+- [x] 3.2.2 Criar `InvestimentoService.java` (gestão de carteira e operações)
+- [x] 3.2.3 Criar `InvestimentoController.java`, `OperacaoController.java`, `AtivoController.java`
+- [x] 3.2.4 Testes unitários do Módulo Investimentos
 
 ---
 
