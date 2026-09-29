@@ -100,11 +100,11 @@
 ## 📈 FASE 3 — Módulo Investimentos
 
 ### 3.1 — Entidades, Repositórios e DTOs
-- [ ] 3.1.1 Criar enum `TipoAtivo.java` (ACAO, FII, RENDA_FIXA)
-- [ ] 3.1.2 Criar entity `Ativo.java` e `AtivoRepository.java`
-- [ ] 3.1.3 Criar entity `Operacao.java` e `OperacaoRepository.java`
-- [ ] 3.1.4 Criar `AtivoBuilder.java` e `OperacaoBuilder.java`
-- [ ] 3.1.5 Criar `AtivoDTO.java`, `OperacaoDTO.java`, `RentabilidadeDTO.java`, `CarteiraDTO.java`
+- [x] 3.1.1 Criar enum `TipoAtivo.java` (ACAO, FII, RENDA_FIXA)
+- [x] 3.1.2 Criar entity `Ativo.java` e `AtivoRepository.java`
+- [x] 3.1.3 Criar entity `Operacao.java` e `OperacaoRepository.java`
+- [x] 3.1.4 Criar `AtivoBuilder.java` e `OperacaoBuilder.java`
+- [x] 3.1.5 Criar `AtivoDTO.java`, `OperacaoDTO.java`, `RentabilidadeDTO.java`, `CarteiraDTO.java`
 
 ### 3.2 — Services & Controllers
 - [ ] 3.2.1 Criar `RentabilidadeService.java` (preço médio, cotação BRAPI, ganho/perda)
