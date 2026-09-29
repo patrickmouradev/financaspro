@@ -41,13 +41,13 @@
 - [x] 1.4.6 Criar `utils/ExcelGenerator.java` (gerarPlanilha)
 
 ### 1.5 — Autenticação JWT
-- [ ] 1.5.1 Criar entity `Usuario.java` (id, nome, email, senhaHash, ativo)
-- [ ] 1.5.2 Criar `UsuarioRepository.java`
-- [ ] 1.5.3 Criar `AuthService.java` (autenticar, gerarToken, validarToken)
-- [ ] 1.5.4 Criar `AuthController.java` (endpoint POST /api/auth/login)
-- [ ] 1.5.5 Criar `JwtFilter.java` (OncePerRequestFilter)
-- [ ] 1.5.6 Criar `SecurityConfig.java` (filtro JWT, endpoints públicos)
-- [ ] 1.5.7 Criar DTOs `LoginRequestDTO.java` e `TokenResponseDTO.java`
+- [x] 1.5.1 Criar entity `Usuario.java` (id, nome, email, senhaHash, ativo)
+- [x] 1.5.2 Criar `UsuarioRepository.java`
+- [x] 1.5.3 Criar `AuthService.java` (autenticar, gerarToken, validarToken)
+- [x] 1.5.4 Criar `AuthController.java` (endpoint POST /api/auth/login)
+- [x] 1.5.5 Criar `JwtFilter.java` (OncePerRequestFilter)
+- [x] 1.5.6 Criar `SecurityConfig.java` (filtro JWT, endpoints públicos)
+- [x] 1.5.7 Criar DTOs `LoginRequestDTO.java` e `TokenResponseDTO.java` e `UsuarioBuilder.java`
 
 ### 1.6 — Módulo Parâmetros de Sistema
 - [ ] 1.6.1 Criar entity `Parametro.java` (id, chave, valor, descricao, tipo)
