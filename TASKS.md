@@ -117,17 +117,17 @@
 ## 🔢 FASE 4 — Módulo Renda Fixa
 
 ### 4.1 — Entidades, DTOs e Services
-- [ ] 4.1.1 Criar entity `IndicadorEconomico.java` e `IndicadorRepository.java`
-- [ ] 4.1.2 Criar entity `SimulacaoSalva.java` e `SimulacaoRepository.java`
-- [ ] 4.1.3 Criar `SimulacaoBuilder.java`
-- [ ] 4.1.4 Criar `SimulacaoRequestDTO.java`, `SimulacaoResultadoDTO.java`, `ComparacaoDTO.java`
-- [ ] 4.1.5 Criar `IpcaService.java` (integração BCB/SGS série 10844, CDI série 12, Selic série 432)
-- [ ] 4.1.6 Criar `CalculadoraRendaFixaService.java` (Prefixado, Pós-CDI, IPCA+, Ganho Real, Comparador)
+- [x] 4.1.1 Criar entity `IndicadorEconomico.java` e `IndicadorRepository.java`
+- [x] 4.1.2 Criar entity `SimulacaoSalva.java` e `SimulacaoRepository.java`
+- [x] 4.1.3 Criar `SimulacaoBuilder.java`
+- [x] 4.1.4 Criar `SimulacaoRequestDTO.java`, `SimulacaoResultadoDTO.java`, `ComparacaoDTO.java`
+- [x] 4.1.5 Criar `IpcaService.java` (integração BCB/SGS série 10844, CDI série 12, Selic série 432)
+- [x] 4.1.6 Criar `CalculadoraRendaFixaService.java` (Prefixado, Pós-CDI, IPCA+, Ganho Real, Comparador)
 
 ### 4.2 — Scheduler, Controllers e Testes
-- [ ] 4.2.1 Criar `IpcaScheduler.java` (sincronização mensal automática do IPCA)
-- [ ] 4.2.2 Criar `RendaFixaController.java` e `IndicadorController.java`
-- [ ] 4.2.3 Testes unitários da Calculadora de Renda Fixa
+- [x] 4.2.1 Criar `IpcaScheduler.java` (sincronização mensal automática do IPCA)
+- [x] 4.2.2 Criar `RendaFixaController.java` e `IndicadorController.java`
+- [x] 4.2.3 Testes unitários da Calculadora de Renda Fixa
 
 ---
 
