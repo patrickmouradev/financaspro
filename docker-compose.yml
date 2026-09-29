@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  financaspro-back:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: financaspro-back-hml
+    ports:
+      - "8087:8087"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-hml}
+      - DB_HOST=${DB_HOST:-192.168.15.10}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-financaspro}
+      - DB_USERNAME=${DB_USERNAME:-financaspro_user}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION_MS=${JWT_EXPIRATION_MS:-86400000}
+      - BRAPI_TOKEN=${BRAPI_TOKEN}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3004}
+      - UPLOAD_DIR=/app/uploads
+    volumes:
+      - "C:/ARQUIVOS_SITES/FINANCASPRO:/app/uploads"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+    networks:
+      - jenkins_net
+
+  financaspro-front:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: financaspro-front-hml
+    ports:
+      - "3004:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8087}
+    restart: always
+    networks:
+      - jenkins_net
+
+networks:
+  jenkins_net:
+    external: true
+    name: jenkins_jenkins_net

@@ -58,12 +58,12 @@
 - [x] 1.6.6 Criar `ParametroDTO.java`
 
 ### 1.7 — Docker e Jenkins (Fundação)
-- [ ] 1.7.1 Criar script/instrução de banco `CREATE DATABASE financaspro;` para o PostgreSQL 192.168.15.10
-- [ ] 1.7.2 Criar script/instrução de pasta `C:\ARQUIVOS_SITES\FINANCASPRO` no servidor
-- [ ] 1.7.3 Criar `backend/Dockerfile` (multi-stage: build Maven + runtime JRE 21)
-- [ ] 1.7.4 Criar `docker-compose.yml` na raiz (backend + frontend sem postgres container)
-- [ ] 1.7.5 Criar `backend/Jenkinsfile` seguindo padrão condomínio
-- [ ] 1.7.6 Documentar registro de containers no Portainer
+- [x] 1.7.1 Criar script/instrução de banco `CREATE DATABASE financaspro;` para o PostgreSQL 192.168.15.10
+- [x] 1.7.2 Criar script/instrução de pasta `C:\ARQUIVOS_SITES\FINANCASPRO` no servidor
+- [x] 1.7.3 Criar `backend/Dockerfile` (multi-stage: build Maven + runtime JRE 21)
+- [x] 1.7.4 Criar `docker-compose.yml` na raiz (backend + frontend sem postgres container)
+- [x] 1.7.5 Criar `backend/Jenkinsfile` seguindo padrão condomínio
+- [x] 1.7.6 Documentar registro de containers no Portainer
 
 ---
 

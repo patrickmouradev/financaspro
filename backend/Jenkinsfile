@@ -1,0 +1,116 @@
+// ============================================================
+// Jenkinsfile — Pipeline do Backend (FinançasPro)
+// Trigger: Manual ou Webhook Git
+// ============================================================
+pipeline {
+    agent any
+
+    environment {
+        // Credenciais vindas do Jenkins Credential Store (nunca hardcoded)
+        DB_HOST           = credentials('FINANCAS_DB_HOST')
+        DB_PORT           = credentials('FINANCAS_DB_PORT')
+        DB_NAME           = credentials('FINANCAS_DB_NAME')
+        DB_USERNAME       = credentials('FINANCAS_DB_USERNAME')
+        DB_PASSWORD       = credentials('FINANCAS_DB_PASSWORD')
+        JWT_SECRET        = credentials('FINANCAS_JWT_SECRET')
+        JWT_EXPIRATION_MS = '86400000'
+        BRAPI_TOKEN       = credentials('FINANCAS_BRAPI_TOKEN')
+        CORS_ORIGINS      = credentials('FINANCAS_CORS_ORIGINS')
+
+        // Configurações Docker
+        DOCKER_IMAGE    = 'patrickmoura/financaspro-back'
+        CONTAINER_NAME  = 'financaspro-back'
+        APP_PORT        = '8088'
+        UPLOAD_VOLUME   = 'C:/ARQUIVOS_SITES/FINANCASPRO:/app/uploads'
+    }
+
+    stages {
+
+        stage('🔍 Checkout') {
+            steps {
+                echo '=== Clonando repositório ==='
+                checkout scm
+            }
+        }
+
+        stage('🛠️ Build Maven (JAR)') {
+            steps {
+                echo '=== Compilando o projeto com Maven ==='
+                dir('backend') {
+                    sh '''
+                        export JAVA_HOME=/usr/lib/jvm/zulu25
+                        export PATH=$JAVA_HOME/bin:$PATH
+                        ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+                    '''
+                }
+            }
+        }
+
+        stage('🐳 Docker Build') {
+            steps {
+                echo '=== Construindo imagem Docker ==='
+                dir('backend') {
+                    sh '''
+                        docker build \
+                            -t ${DOCKER_IMAGE}:latest \
+                            -t ${DOCKER_IMAGE}:${BUILD_NUMBER} \
+                            .
+                    '''
+                }
+            }
+        }
+
+        stage('🚀 Deploy') {
+            steps {
+                echo '=== Subindo container backend no servidor ==='
+                sh '''
+                    docker stop ${CONTAINER_NAME} || true
+                    docker rm   ${CONTAINER_NAME} || true
+
+                    docker run \
+                        --name ${CONTAINER_NAME} \
+                        --network jenkins_jenkins_net \
+                        --add-host host.docker.internal:host-gateway \
+                        --restart=always \
+                        -v "${UPLOAD_VOLUME}" \
+                        -d \
+                        -p ${APP_PORT}:8088 \
+                        -e SPRING_PROFILES_ACTIVE=prd \
+                        -e DB_HOST="${DB_HOST}" \
+                        -e DB_PORT="${DB_PORT}" \
+                        -e DB_NAME="${DB_NAME}" \
+                        -e DB_USERNAME="${DB_USERNAME}" \
+                        -e DB_PASSWORD="${DB_PASSWORD}" \
+                        -e JWT_SECRET="${JWT_SECRET}" \
+                        -e JWT_EXPIRATION_MS="${JWT_EXPIRATION_MS}" \
+                        -e BRAPI_TOKEN="${BRAPI_TOKEN}" \
+                        -e CORS_ORIGINS="${CORS_ORIGINS}" \
+                        ${DOCKER_IMAGE}:latest
+                '''
+            }
+        }
+
+        stage('✅ Health Check') {
+            steps {
+                echo '=== Verificando se o Backend subiu ==='
+                sh '''
+                    sleep 20
+                    curl -f http://${CONTAINER_NAME}:8088/actuator/health || \
+                        (echo "ERRO: Backend não respondeu ao health check!" && exit 1)
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline do Backend concluída com sucesso! Build #${BUILD_NUMBER}"
+        }
+        failure {
+            echo "❌ Pipeline do Backend FALHOU no build #${BUILD_NUMBER}. Verifique os logs."
+        }
+        always {
+            sh 'docker image prune -f 2>/dev/null || true'
+        }
+    }
+}
