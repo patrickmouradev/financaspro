@@ -12,12 +12,12 @@
 - [x] 1.1.3 Criar `README.md` inicial com visão geral e instruções de execução
 
 ### 1.2 — Setup do Backend Spring Boot
-- [ ] 1.2.1 Criar estrutura Maven `backend/` com Java 21 e `pom.xml` completo (Spring Boot 3, Security, JPA, PostgreSQL, Flyway, JWT, Apache POI, iText, Actuator)
-- [ ] 1.2.2 Criar `backend/src/main/resources/application.yaml` (base sem segredos)
-- [ ] 1.2.3 Criar `backend/src/main/resources/application-hml.yaml`
-- [ ] 1.2.4 Criar `backend/src/main/resources/application-prd.yaml`
-- [ ] 1.2.5 Criar `backend/.env.example`
-- [ ] 1.2.6 Criar classe principal `FinancasproApplication.java` com anotações básicas
+- [x] 1.2.1 Criar estrutura Maven `backend/` com Java 21 e `pom.xml` completo (Spring Boot 3, Security, JPA, PostgreSQL, Flyway, JWT, Apache POI, iText, Actuator)
+- [x] 1.2.2 Criar `backend/src/main/resources/application.yaml` (base sem segredos)
+- [x] 1.2.3 Criar `backend/src/main/resources/application-hml.yaml`
+- [x] 1.2.4 Criar `backend/src/main/resources/application-prd.yaml`
+- [x] 1.2.5 Criar `backend/.env.example`
+- [x] 1.2.6 Criar classe principal `FinancasproApplication.java` com anotações básicas
 
 ### 1.3 — Banco de Dados e Migrations
 - [ ] 1.3.1 Criar migration `V1__create_usuario.sql`

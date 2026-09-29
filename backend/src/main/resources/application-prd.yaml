@@ -1,0 +1,11 @@
+spring:
+  jpa:
+    show-sql: false
+
+server:
+  port: 8088
+
+logging:
+  level:
+    root: WARN
+    com.financaspro: INFO

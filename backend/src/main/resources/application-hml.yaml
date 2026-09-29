@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8087
+
+logging:
+  level:
+    root: INFO
+    com.financaspro: DEBUG
+    org.hibernate.SQL: DEBUG
