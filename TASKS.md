@@ -70,10 +70,10 @@
 ## 📄 FASE 2 — Módulo Extrato & Gastos
 
 ### 2.1 — Entidades e Repositórios
-- [ ] 2.1.1 Criar entity `ContaBancaria.java` e `ContaBancariaRepository.java`
-- [ ] 2.1.2 Criar entity `Categoria.java` e `CategoriaRepository.java`
-- [ ] 2.1.3 Criar entity `RegraCategoria.java` e `RegraCategoriaRepository.java`
-- [ ] 2.1.4 Criar entity `Lancamento.java` e `LancamentoRepository.java` (queries customizadas)
+- [x] 2.1.1 Criar entity `ContaBancaria.java` e `ContaBancariaRepository.java`
+- [x] 2.1.2 Criar entity `Categoria.java` e `CategoriaRepository.java`
+- [x] 2.1.3 Criar entity `RegraCategoria.java` e `RegraCategoriaRepository.java`
+- [x] 2.1.4 Criar entity `Lancamento.java` e `LancamentoRepository.java` (queries customizadas)
 
 ### 2.2 — Builders
 - [ ] 2.2.1 Criar `LancamentoBuilder.java`, `ContaBancariaBuilder.java`, `CategoriaBuilder.java`
