@@ -20,17 +20,17 @@
 - [x] 1.2.6 Criar classe principal `FinancasproApplication.java` com anotações básicas
 
 ### 1.3 — Banco de Dados e Migrations
-- [ ] 1.3.1 Criar migration `V1__create_usuario.sql`
-- [ ] 1.3.2 Criar migration `V2__create_conta_bancaria.sql`
-- [ ] 1.3.3 Criar migration `V3__create_categoria_regra.sql`
-- [ ] 1.3.4 Criar migration `V4__create_lancamento.sql`
-- [ ] 1.3.5 Criar migration `V5__create_ativo_operacao.sql`
-- [ ] 1.3.6 Criar migration `V6__create_fii_dividendo.sql`
-- [ ] 1.3.7 Criar migration `V7__create_indicador_economico.sql`
-- [ ] 1.3.8 Criar migration `V8__create_simulacao_salva.sql`
-- [ ] 1.3.9 Criar migration `V9__create_parametro.sql`
-- [ ] 1.3.10 Criar migration `V10__seed_categorias_e_parametros.sql` (dados iniciais e senhas de arquivo)
-- [ ] 1.3.11 Validar execução das migrations Flyway via Maven (`mvn clean test-compile`)
+- [x] 1.3.1 Criar migration `V1__create_usuario.sql`
+- [x] 1.3.2 Criar migration `V2__create_conta_bancaria.sql`
+- [x] 1.3.3 Criar migration `V3__create_categoria_regra.sql`
+- [x] 1.3.4 Criar migration `V4__create_lancamento.sql`
+- [x] 1.3.5 Criar migration `V5__create_ativo_operacao.sql`
+- [x] 1.3.6 Criar migration `V6__create_fii_dividendo.sql`
+- [x] 1.3.7 Criar migration `V7__create_indicador_economico.sql`
+- [x] 1.3.8 Criar migration `V8__create_simulacao_salva.sql`
+- [x] 1.3.9 Criar migration `V9__create_parametro.sql`
+- [x] 1.3.10 Criar migration `V10__seed_categorias_e_parametros.sql` (dados iniciais e senhas de arquivo)
+- [x] 1.3.11 Validar execução das migrations Flyway via Maven (`mvn clean test-compile`)
 
 ### 1.4 — Package Utils
 - [ ] 1.4.1 Criar `utils/DateUtils.java` (anoMesAtual, calcularDiasEntre, formatarDataBr, primeiroEUltimoDiaMes)
