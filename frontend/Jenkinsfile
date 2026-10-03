@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = 'financaspro-frontend'
+        APP_NAME = 'frontendfinancaspro'
         PORT_HML = '3004'
         PORT_PRD = '3003'
     }
@@ -38,9 +38,9 @@ pipeline {
                 branch 'master'
             }
             steps {
-                sh "docker stop ${APP_NAME}-hml || true"
-                sh "docker rm ${APP_NAME}-hml || true"
-                sh "docker run -d --name ${APP_NAME}-hml -p ${PORT_HML}:3004 -e NEXT_PUBLIC_API_URL=http://localhost:8087 ${APP_NAME}:latest"
+                sh "docker stop ${APP_NAME} || true"
+                sh "docker rm ${APP_NAME} || true"
+                sh "docker run -d --name ${APP_NAME} --network jenkins_jenkins_net -p ${PORT_HML}:3000 -e NEXT_PUBLIC_API_URL=http://localhost:8087 ${APP_NAME}:latest"
             }
         }
 
@@ -51,7 +51,7 @@ pipeline {
             steps {
                 sh "docker stop ${APP_NAME}-prd || true"
                 sh "docker rm ${APP_NAME}-prd || true"
-                sh "docker run -d --name ${APP_NAME}-prd -p ${PORT_PRD}:3004 -e NEXT_PUBLIC_API_URL=http://localhost:8088 ${APP_NAME}:latest"
+                sh "docker run -d --name ${APP_NAME}-prd --network jenkins_jenkins_net -p ${PORT_PRD}:3000 -e NEXT_PUBLIC_API_URL=http://localhost:8088 ${APP_NAME}:latest"
             }
         }
     }

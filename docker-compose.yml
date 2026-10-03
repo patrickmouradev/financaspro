@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  financaspro-back:
+  backendfinancaspro:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: financaspro-back-hml
+    container_name: backendfinancaspro
     ports:
       - "8087:8087"
     environment:
@@ -28,11 +28,11 @@ services:
     networks:
       - jenkins_net
 
-  financaspro-front:
+  frontendfinancaspro:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: financaspro-front-hml
+    container_name: frontendfinancaspro
     ports:
       - "3004:3000"
     environment:

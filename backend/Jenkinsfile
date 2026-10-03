@@ -19,7 +19,7 @@ pipeline {
 
         // Configurações Docker
         DOCKER_IMAGE    = 'patrickmoura/financaspro-back'
-        CONTAINER_NAME  = 'financaspro-back'
+        CONTAINER_NAME  = 'backendfinancaspro'
         APP_PORT        = '8088'
         UPLOAD_VOLUME   = 'C:/ARQUIVOS_SITES/FINANCASPRO:/app/uploads'
     }
