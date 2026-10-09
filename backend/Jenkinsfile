@@ -110,7 +110,7 @@ pipeline {
             echo "❌ Pipeline do Backend FALHOU no build #${BUILD_NUMBER}. Verifique os logs."
         }
         always {
-            node {
+            script {
                 sh 'docker image prune -f 2>/dev/null || true'
             }
         }
