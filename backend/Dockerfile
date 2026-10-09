@@ -26,8 +26,8 @@ USER financaspro:financaspro
 # Copia o artefato .jar compilado
 COPY --from=builder /app/target/financaspro-backend-1.0.0-SNAPSHOT.jar app.jar
 
-# Exposição da porta (HML: 8087 / PRD: 8088 via env)
-EXPOSE 8087 8088
+# Exposição da porta 8087
+EXPOSE 8087
 
 # Comando de inicialização
 ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]

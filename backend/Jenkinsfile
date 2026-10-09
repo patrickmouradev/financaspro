@@ -20,7 +20,7 @@ pipeline {
         // Configurações Docker
         DOCKER_IMAGE    = 'patrickmoura/financaspro-back'
         CONTAINER_NAME  = 'backendfinancaspro'
-        APP_PORT        = '8088'
+        APP_PORT        = '8087'
         UPLOAD_VOLUME   = 'C:/ARQUIVOS_SITES/FINANCASPRO:/app/uploads'
     }
 
@@ -71,6 +71,12 @@ pipeline {
             steps {
                 echo '=== Subindo container backend no servidor ==='
                 sh '''
+                    OLD_CONTAINER=$(docker ps -q --filter "publish=${APP_PORT}")
+                    if [ -n "$OLD_CONTAINER" ]; then
+                        docker stop $OLD_CONTAINER || true
+                        docker rm $OLD_CONTAINER || true
+                    fi
+
                     docker stop ${CONTAINER_NAME} || true
                     docker rm   ${CONTAINER_NAME} || true
 
@@ -81,8 +87,9 @@ pipeline {
                         --restart=always \
                         -v "${UPLOAD_VOLUME}" \
                         -d \
-                        -p ${APP_PORT}:8088 \
+                        -p ${APP_PORT}:8087 \
                         -e SPRING_PROFILES_ACTIVE=prd \
+                        -e PORT=8087 \
                         -e DB_HOST="${DB_HOST}" \
                         -e DB_PORT="${DB_PORT}" \
                         -e DB_NAME="${DB_NAME}" \
@@ -102,7 +109,7 @@ pipeline {
                 echo '=== Verificando se o Backend subiu ==='
                 sh '''
                     sleep 20
-                    curl -f http://${CONTAINER_NAME}:8088/actuator/health || \
+                    curl -f http://${CONTAINER_NAME}:8087/actuator/health || \
                         (echo "ERRO: Backend não respondeu ao health check!" && exit 1)
                 '''
             }

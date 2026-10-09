@@ -51,7 +51,7 @@ pipeline {
             steps {
                 sh "docker stop ${APP_NAME}-prd || true"
                 sh "docker rm ${APP_NAME}-prd || true"
-                sh "docker run -d --name ${APP_NAME}-prd --network jenkins_jenkins_net -p ${PORT_PRD}:3000 -e NEXT_PUBLIC_API_URL=http://localhost:8088 ${APP_NAME}:latest"
+                sh "docker run -d --name ${APP_NAME}-prd --network jenkins_jenkins_net -p ${PORT_PRD}:3000 -e NEXT_PUBLIC_API_URL=http://localhost:8087 ${APP_NAME}:latest"
             }
         }
     }
