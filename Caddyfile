@@ -1,0 +1,17 @@
+# ============================================================
+# Caddyfile — Configuração do Proxy Reverso para FinançasPro
+# Rede Docker: jenkins_jenkins_net
+# ============================================================
+
+financaspro.duckdns.org {
+    # Aponta para o backend Spring Boot na rede Docker
+    # Obs: 'handle /api/*' preserva o prefixo /api que os Controllers do Spring Boot utilizam (@RequestMapping("/api/..."))
+    handle /api/* {
+        reverse_proxy backendfinancaspro:8087
+    }
+
+    # Aponta para o frontend Next.js na rede Docker (porta interna 3000)
+    handle {
+        reverse_proxy frontendfinancaspro:3000
+    }
+}

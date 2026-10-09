@@ -1,4 +1,4 @@
-package com.financaspro.service;
+package com.financaspro.modulo.containvestimento.service;
 
 import com.financaspro.builder.AtivoBuilder;
 import com.financaspro.builder.OperacaoBuilder;
@@ -39,6 +39,10 @@ public class InvestimentoService {
                 .comTicker(tickerUpper)
                 .comNome(dto.getNome())
                 .comTipo(dto.getTipo())
+                .comCategoriaNome(dto.getCategoriaNome())
+                .comClasse(dto.getClasse())
+                .comIndexador(dto.getIndexador())
+                .comTaxaAdicional(dto.getTaxaAdicional())
                 .comSetor(dto.getSetor())
                 .build();
 
@@ -53,6 +57,10 @@ public class InvestimentoService {
 
         ativo.setNome(dto.getNome());
         ativo.setTipo(dto.getTipo());
+        ativo.setCategoriaNome(dto.getCategoriaNome());
+        ativo.setClasse(dto.getClasse());
+        ativo.setIndexador(dto.getIndexador());
+        ativo.setTaxaAdicional(dto.getTaxaAdicional());
         ativo.setSetor(dto.getSetor());
 
         Ativo salvo = ativoRepository.save(ativo);
@@ -128,7 +136,18 @@ public class InvestimentoService {
                 .ticker(ativo.getTicker())
                 .nome(ativo.getNome())
                 .tipo(ativo.getTipo())
+                .categoriaNome(ativo.getCategoriaNome())
+                .classe(ativo.getClasse())
+                .indexador(ativo.getIndexador())
+                .taxaAdicional(ativo.getTaxaAdicional())
                 .setor(ativo.getSetor())
+                .dataAplicacao(ativo.getDataAplicacao())
+                .dataVencimento(ativo.getDataVencimento())
+                .liquidez(ativo.getLiquidez())
+                .porcentagemTaxa(ativo.getPorcentagemTaxa())
+                .emissor(ativo.getEmissor())
+                .cnpjEmissor(ativo.getCnpjEmissor())
+                .produto(ativo.getProduto())
                 .criadoEm(ativo.getCriadoEm())
                 .build();
     }

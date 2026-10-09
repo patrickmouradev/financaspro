@@ -43,6 +43,15 @@ public class CategoriaService {
         return resultado;
     }
 
+    public List<RegraCategoriaDTO> listarTodasRegras() {
+        List<RegraCategoria> regras = regraCategoriaRepository.findAllOrderByPrioridadeEPalavraChaveLength();
+        List<RegraCategoriaDTO> resultado = new ArrayList<>();
+        for (RegraCategoria r : regras) {
+            resultado.add(RegraCategoriaBuilder.paraDTO(r));
+        }
+        return resultado;
+    }
+
     @Transactional
     public CategoriaDTO criar(CategoriaDTO dto) {
         Categoria cat = CategoriaBuilder.criar(dto.getNome(), dto.getIcone(), dto.getCor(), dto.getTipo());
@@ -77,5 +86,10 @@ public class CategoriaService {
     @Transactional
     public void removerRegra(Long regraId) {
         regraCategoriaRepository.deleteById(regraId);
+    }
+
+    @Transactional
+    public void deletar(Long id) {
+        categoriaRepository.deleteById(id);
     }
 }

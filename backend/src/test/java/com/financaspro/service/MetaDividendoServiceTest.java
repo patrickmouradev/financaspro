@@ -7,6 +7,10 @@ import com.financaspro.model.entity.Dividendo;
 import com.financaspro.model.entity.Fii;
 import com.financaspro.repository.DividendoRepository;
 import com.financaspro.repository.FiiRepository;
+import com.financaspro.repository.LancamentoRepository;
+import com.financaspro.repository.OperacaoRepository;
+import com.financaspro.modulo.fundos.service.FiiService;
+import com.financaspro.modulo.fundos.service.MetaDividendoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -24,13 +28,19 @@ class MetaDividendoServiceTest {
 
     private FiiRepository fiiRepository;
     private DividendoRepository dividendoRepository;
+    private FiiService fiiService;
+    private LancamentoRepository lancamentoRepository;
+    private OperacaoRepository operacaoRepository;
     private MetaDividendoService metaDividendoService;
 
     @BeforeEach
     void setUp() {
         fiiRepository = Mockito.mock(FiiRepository.class);
         dividendoRepository = Mockito.mock(DividendoRepository.class);
-        metaDividendoService = new MetaDividendoService(fiiRepository, dividendoRepository);
+        fiiService = Mockito.mock(FiiService.class);
+        lancamentoRepository = Mockito.mock(LancamentoRepository.class);
+        operacaoRepository = Mockito.mock(OperacaoRepository.class);
+        metaDividendoService = new MetaDividendoService(fiiRepository, dividendoRepository, fiiService, lancamentoRepository, operacaoRepository);
     }
 
     @Test

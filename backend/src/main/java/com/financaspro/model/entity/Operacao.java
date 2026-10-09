@@ -56,6 +56,15 @@ public class Operacao {
     @Column(columnDefinition = "TEXT")
     private String observacao;
 
+    @Column(name = "data_vencimento")
+    private LocalDate dataVencimento;
+
+    @Column(length = 100)
+    private String liquidez;
+
+    @Column(name = "porcentagem_taxa", length = 100)
+    private String porcentagemTaxa;
+
     @Column(name = "criado_em", updatable = false)
     private OffsetDateTime criadoEm;
 

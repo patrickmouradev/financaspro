@@ -25,4 +25,10 @@ public class AuthController {
         TokenResponseDTO response = authService.autenticar(request);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponseDTO> refresh(@org.springframework.web.bind.annotation.RequestHeader("Authorization") String bearerToken) {
+        TokenResponseDTO response = authService.renovarToken(bearerToken);
+        return ResponseEntity.ok(response);
+    }
 }

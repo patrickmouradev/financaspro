@@ -1,4 +1,4 @@
-package com.financaspro.service;
+package com.financaspro.modulo.containvestimento.service;
 
 import com.financaspro.model.dto.CarteiraDTO;
 import com.financaspro.model.dto.RentabilidadeDTO;
@@ -59,7 +59,6 @@ public class RentabilidadeService {
             }
         }
 
-        // Calcular percentual de cada ativo na carteira
         final BigDecimal totalAtualFinal = valorTotalAtual;
         for (RentabilidadeDTO item : itens) {
             if (totalAtualFinal.compareTo(BigDecimal.ZERO) > 0) {
@@ -122,7 +121,7 @@ public class RentabilidadeService {
 
         BigDecimal precoAtual = buscarCotacaoBrapi(ativo.getTicker());
         if (precoAtual == null) {
-            precoAtual = precoMedio; // Fallback para preço médio se API indisponível
+            precoAtual = precoMedio;
         }
 
         BigDecimal valorTotalInvestido = quantidadeAtual.multiply(precoMedio);
@@ -130,12 +129,25 @@ public class RentabilidadeService {
         BigDecimal lucroPrejuizo = valorAtual.subtract(valorTotalInvestido);
         BigDecimal variacao = PercentualUtils.calcularVariacao(valorAtual, valorTotalInvestido);
 
+        Long diasAteVencimento = null;
+        String statusVencimento = null;
+        if (ativo.getDataVencimento() != null) {
+            diasAteVencimento = java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), ativo.getDataVencimento());
+            if (java.time.LocalDate.now().isAfter(ativo.getDataVencimento())) {
+                statusVencimento = "VENCIDO";
+            } else {
+                statusVencimento = "EM_ANDAMENTO";
+            }
+        }
+
         return RentabilidadeDTO.builder()
                 .ativoId(ativo.getId())
                 .ticker(ativo.getTicker())
                 .nomeAtivo(ativo.getNome())
                 .tipoAtivo(ativo.getTipo())
                 .setor(ativo.getSetor())
+                .classe(ativo.getClasse())
+                .indexador(ativo.getIndexador())
                 .quantidadeAtual(quantidadeAtual)
                 .precoMedio(MoedaUtils.arredondar2Casas(precoMedio))
                 .precoAtual(MoedaUtils.arredondar2Casas(precoAtual))
@@ -144,6 +156,15 @@ public class RentabilidadeService {
                 .lucroPrejuizo(MoedaUtils.arredondar2Casas(lucroPrejuizo))
                 .variacaoPercentual(variacao)
                 .percentualCarteira(BigDecimal.ZERO)
+                .dataAplicacao(ativo.getDataAplicacao())
+                .dataVencimento(ativo.getDataVencimento())
+                .liquidez(ativo.getLiquidez())
+                .porcentagemTaxa(ativo.getPorcentagemTaxa())
+                .emissor(ativo.getEmissor())
+                .cnpjEmissor(ativo.getCnpjEmissor())
+                .produto(ativo.getProduto() != null ? ativo.getProduto() : ativo.getClasse())
+                .diasAteVencimento(diasAteVencimento)
+                .statusVencimento(statusVencimento)
                 .build();
     }
 

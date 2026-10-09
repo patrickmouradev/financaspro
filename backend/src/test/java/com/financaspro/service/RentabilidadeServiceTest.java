@@ -9,6 +9,7 @@ import com.financaspro.model.enums.TipoAtivo;
 import com.financaspro.model.enums.TipoOperacao;
 import com.financaspro.repository.AtivoRepository;
 import com.financaspro.repository.OperacaoRepository;
+import com.financaspro.modulo.containvestimento.service.RentabilidadeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

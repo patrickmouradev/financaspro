@@ -1,10 +1,10 @@
-package com.financaspro.controller;
+package com.financaspro.modulo.rendafixa.controller;
 
 import com.financaspro.model.dto.ComparacaoDTO;
 import com.financaspro.model.dto.SimulacaoRequestDTO;
 import com.financaspro.model.dto.SimulacaoResultadoDTO;
 import com.financaspro.model.entity.SimulacaoSalva;
-import com.financaspro.service.CalculadoraRendaFixaService;
+import com.financaspro.modulo.rendafixa.service.CalculadoraRendaFixaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

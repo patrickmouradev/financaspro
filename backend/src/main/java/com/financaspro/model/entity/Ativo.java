@@ -15,6 +15,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -29,7 +31,7 @@ public class Ativo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, unique = true, length = 50)
     private String ticker;
 
     @Column(nullable = false, length = 150)
@@ -39,8 +41,41 @@ public class Ativo {
     @Column(nullable = false, length = 30)
     private TipoAtivo tipo;
 
+    @Column(name = "categoria_nome", length = 100)
+    private String categoriaNome;
+
+    @Column(length = 100)
+    private String classe;
+
+    @Column(length = 50)
+    private String indexador;
+
+    @Column(name = "taxa_adicional", precision = 10, scale = 4)
+    private BigDecimal taxaAdicional;
+
     @Column(length = 100)
     private String setor;
+
+    @Column(name = "data_aplicacao")
+    private LocalDate dataAplicacao;
+
+    @Column(name = "data_vencimento")
+    private LocalDate dataVencimento;
+
+    @Column(length = 100)
+    private String liquidez;
+
+    @Column(name = "porcentagem_taxa", length = 100)
+    private String porcentagemTaxa;
+
+    @Column(length = 150)
+    private String emissor;
+
+    @Column(name = "cnpj_emissor", length = 30)
+    private String cnpjEmissor;
+
+    @Column(length = 150)
+    private String produto;
 
     @Column(name = "criado_em", updatable = false)
     private OffsetDateTime criadoEm;

@@ -77,4 +77,24 @@ public class AuthService {
             return null;
         }
     }
+
+    public TokenResponseDTO renovarToken(String bearerToken) {
+        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            throw new RuntimeException("Token num formato inválido");
+        }
+        String token = bearerToken.substring(7);
+        String email = validarTokenEObterSubject(token);
+        if (email == null) {
+            throw new RuntimeException("Token expirado ou inválido");
+        }
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (!Boolean.TRUE.equals(usuario.getAtivo())) {
+            throw new RuntimeException("Usuário inativo");
+        }
+
+        String novoToken = gerarToken(usuario);
+        return UsuarioBuilder.criarTokenResponse(novoToken, usuario);
+    }
 }

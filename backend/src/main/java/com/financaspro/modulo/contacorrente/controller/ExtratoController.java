@@ -1,8 +1,8 @@
-package com.financaspro.controller;
+package com.financaspro.modulo.contacorrente.controller;
 
 import com.financaspro.model.dto.LancamentoDTO;
 import com.financaspro.model.dto.ResumoMensalDTO;
-import com.financaspro.service.ExtratoService;
+import com.financaspro.modulo.contacorrente.service.ExtratoService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,13 @@ public class ExtratoController {
         this.extratoService = extratoService;
     }
 
-    @GetMapping("/lancamentos")
+    @GetMapping("/meses-disponiveis")
+    public ResponseEntity<List<String>> listarMesesDisponiveis() {
+        List<String> meses = extratoService.listarMesesDisponiveis();
+        return ResponseEntity.ok(meses);
+    }
+
+    @GetMapping({"", "/lancamentos"})
     public ResponseEntity<List<LancamentoDTO>> listarLancamentos(@RequestParam(value = "anoMes", required = false) String anoMesStr) {
         YearMonth ym = parseAnoMes(anoMesStr);
         List<LancamentoDTO> lancamentos = extratoService.listarLancamentosPorMes(ym);

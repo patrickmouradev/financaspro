@@ -29,7 +29,7 @@ server:
 
 jwt:
   secret: ${JWT_SECRET:dGVzdGUtY2hhdmUtand0LXNlZ3VyYS1jb20tbWluaW1vLTY0LWNhcmFjdGVyZXMtYWxlYXRvcmlvcy1maW5hbmNhc3Bybw==}
-  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  expiration-ms: ${JWT_EXPIRATION_MS:1200000}
 
 app:
   upload-dir: ${UPLOAD_DIR:/app/uploads}

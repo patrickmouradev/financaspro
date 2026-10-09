@@ -1,10 +1,10 @@
-package com.financaspro.controller;
+package com.financaspro.modulo.containvestimento.controller;
 
 import com.financaspro.model.dto.CarteiraDTO;
 import com.financaspro.model.dto.RentabilidadeDTO;
 import com.financaspro.model.entity.Ativo;
 import com.financaspro.repository.AtivoRepository;
-import com.financaspro.service.RentabilidadeService;
+import com.financaspro.modulo.containvestimento.service.RentabilidadeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

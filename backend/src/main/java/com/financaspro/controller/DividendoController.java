@@ -1,7 +1,7 @@
 package com.financaspro.controller;
 
 import com.financaspro.model.dto.DividendoDTO;
-import com.financaspro.service.FiiService;
+import com.financaspro.modulo.fundos.service.FiiService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

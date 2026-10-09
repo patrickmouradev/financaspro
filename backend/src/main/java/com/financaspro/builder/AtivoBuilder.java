@@ -3,6 +3,7 @@ package com.financaspro.builder;
 import com.financaspro.model.entity.Ativo;
 import com.financaspro.model.enums.TipoAtivo;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 public class AtivoBuilder {
@@ -11,6 +12,10 @@ public class AtivoBuilder {
     private String ticker;
     private String nome;
     private TipoAtivo tipo;
+    private String categoriaNome;
+    private String classe;
+    private String indexador;
+    private BigDecimal taxaAdicional;
     private String setor;
     private OffsetDateTime criadoEm;
 
@@ -38,6 +43,26 @@ public class AtivoBuilder {
         return this;
     }
 
+    public AtivoBuilder comCategoriaNome(String categoriaNome) {
+        this.categoriaNome = categoriaNome;
+        return this;
+    }
+
+    public AtivoBuilder comClasse(String classe) {
+        this.classe = classe;
+        return this;
+    }
+
+    public AtivoBuilder comIndexador(String indexador) {
+        this.indexador = indexador;
+        return this;
+    }
+
+    public AtivoBuilder comTaxaAdicional(BigDecimal taxaAdicional) {
+        this.taxaAdicional = taxaAdicional;
+        return this;
+    }
+
     public AtivoBuilder comSetor(String setor) {
         this.setor = setor;
         return this;
@@ -54,6 +79,10 @@ public class AtivoBuilder {
         ativo.setTicker(this.ticker);
         ativo.setNome(this.nome);
         ativo.setTipo(this.tipo);
+        ativo.setCategoriaNome(this.categoriaNome);
+        ativo.setClasse(this.classe);
+        ativo.setIndexador(this.indexador);
+        ativo.setTaxaAdicional(this.taxaAdicional);
         ativo.setSetor(this.setor);
         ativo.setCriadoEm(this.criadoEm != null ? this.criadoEm : OffsetDateTime.now());
         return ativo;

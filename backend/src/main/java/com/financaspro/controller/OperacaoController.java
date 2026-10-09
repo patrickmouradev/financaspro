@@ -1,7 +1,7 @@
 package com.financaspro.controller;
 
 import com.financaspro.model.dto.OperacaoDTO;
-import com.financaspro.service.InvestimentoService;
+import com.financaspro.modulo.containvestimento.service.InvestimentoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -31,4 +32,14 @@ public class LancamentoDTO {
     private Integer totalParcelas;
     private String statusCategorizacao;
     private String observacao;
+
+    // Detalhes Renda Fixa para Preview / Edição / Confirmação
+    private LocalDate dataAplicacao;
+    private LocalDate dataVencimento;
+    private String liquidez;
+    private String indice;
+    private String taxa;
+    private String produto;
+    private String emissor;
+    private String cnpjEmissor;
 }

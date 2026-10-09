@@ -27,11 +27,13 @@ public class ImportacaoController {
     @PostMapping
     public ResponseEntity<ImportacaoResultadoDTO> uploadEPreview(
             @RequestParam("arquivo") MultipartFile arquivo,
-            @RequestParam(value = "contaBancariaId", required = false) Long contaBancariaId) throws Exception {
+            @RequestParam(value = "tipoArquivo", required = false, defaultValue = "AUTO") String tipoArquivo,
+            @RequestParam(value = "contaBancariaId", required = false) Long contaBancariaId,
+            @RequestParam(value = "senha", required = false) String senha) throws Exception {
 
         String nomeOriginal = arquivo.getOriginalFilename();
         InputStream is = arquivo.getInputStream();
-        ImportacaoResultadoDTO resultado = importacaoService.processarArquivo(is, nomeOriginal, contaBancariaId);
+        ImportacaoResultadoDTO resultado = importacaoService.processarArquivoComTipo(is, nomeOriginal, tipoArquivo, contaBancariaId, senha);
 
         return ResponseEntity.ok(resultado);
     }
@@ -41,4 +43,11 @@ public class ImportacaoController {
         List<LancamentoDTO> salvos = importacaoService.confirmarImportacao(dtosConfirmados);
         return ResponseEntity.ok(salvos);
     }
+
+    @PostMapping("/zerar-dados")
+    public ResponseEntity<String> zerarDados() {
+        importacaoService.zerarTodosOsDados();
+        return ResponseEntity.ok("Todos os lançamentos, operações, proventos e ativos foram zerados com sucesso.");
+    }
 }
+

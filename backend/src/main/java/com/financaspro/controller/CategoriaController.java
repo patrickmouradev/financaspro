@@ -53,9 +53,21 @@ public class CategoriaController {
         return ResponseEntity.ok(regra);
     }
 
+    @GetMapping("/regras")
+    public ResponseEntity<List<RegraCategoriaDTO>> listarTodasRegras() {
+        List<RegraCategoriaDTO> lista = categoriaService.listarTodasRegras();
+        return ResponseEntity.ok(lista);
+    }
+
     @DeleteMapping("/regras/{regraId}")
     public ResponseEntity<Void> removerRegra(@PathVariable Long regraId) {
         categoriaService.removerRegra(regraId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        categoriaService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,4 +1,4 @@
-package com.financaspro.service;
+package com.financaspro.modulo.rendafixa.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.financaspro.builder.SimulacaoBuilder;
@@ -7,6 +7,7 @@ import com.financaspro.model.dto.SimulacaoRequestDTO;
 import com.financaspro.model.dto.SimulacaoResultadoDTO;
 import com.financaspro.model.entity.SimulacaoSalva;
 import com.financaspro.repository.SimulacaoRepository;
+import com.financaspro.service.IpcaService;
 import com.financaspro.utils.MoedaUtils;
 import com.financaspro.utils.PercentualUtils;
 import org.springframework.stereotype.Service;
@@ -87,7 +88,6 @@ public class CalculadoraRendaFixaService {
 
         BigDecimal rentabilidadeLiquidaPct = PercentualUtils.calcularPercentual(rendimentoLiquido, valorInvestido);
 
-        // Inflação acumulada no período da aplicação
         double ipcaAcumuladoDbl = (Math.pow(1.0 + (ipcaAno.doubleValue() / 100.0), anos) - 1.0) * 100.0;
         double ganhoRealDbl = ((1.0 + (rentabilidadeLiquidaPct.doubleValue() / 100.0)) / (1.0 + (ipcaAcumuladoDbl / 100.0)) - 1.0) * 100.0;
         BigDecimal ganhoRealPct = new BigDecimal(ganhoRealDbl).setScale(2, RoundingMode.HALF_UP);

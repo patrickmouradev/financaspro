@@ -24,8 +24,14 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     Optional<Lancamento> findByDescricaoAndDataLancamentoAndValor(
             String descricao, LocalDateTime dataLancamento, BigDecimal valor);
 
-    @Query("SELECT l.categoria.id, l.categoria.nome, l.categoria.cor, SUM(l.valor) " +
-           "FROM Lancamento l WHERE l.dataLancamento BETWEEN :inicio AND :fim AND l.valor > 0 " +
-           "GROUP BY l.categoria.id, l.categoria.nome, l.categoria.cor ORDER BY SUM(l.valor) DESC")
+    @Query("SELECT MAX(l.dataLancamento) FROM Lancamento l")
+    Optional<LocalDateTime> findMaxDataLancamento();
+
+    @Query("SELECT DISTINCT l.dataLancamento FROM Lancamento l ORDER BY l.dataLancamento DESC")
+    List<LocalDateTime> findAllDataLancamento();
+
+    @Query("SELECT l.categoria.id, l.categoria.nome, l.categoria.cor, SUM(ABS(l.valor)) " +
+           "FROM Lancamento l WHERE l.dataLancamento BETWEEN :inicio AND :fim AND l.categoria IS NOT NULL " +
+           "GROUP BY l.categoria.id, l.categoria.nome, l.categoria.cor ORDER BY SUM(ABS(l.valor)) DESC")
     List<Object[]> sumByCategoriaAndPeriodo(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 }

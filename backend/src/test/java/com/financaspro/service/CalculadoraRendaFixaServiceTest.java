@@ -1,5 +1,7 @@
 package com.financaspro.service;
 
+import com.financaspro.modulo.rendafixa.service.CalculadoraRendaFixaService;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.financaspro.model.dto.ComparacaoDTO;
 import com.financaspro.model.dto.SimulacaoRequestDTO;

@@ -1,9 +1,9 @@
-package com.financaspro.controller;
+package com.financaspro.modulo.fundos.controller;
 
 import com.financaspro.model.dto.FiiDTO;
 import com.financaspro.model.dto.ProjecaoMetaDTO;
-import com.financaspro.service.FiiService;
-import com.financaspro.service.MetaDividendoService;
+import com.financaspro.modulo.fundos.service.FiiService;
+import com.financaspro.modulo.fundos.service.MetaDividendoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

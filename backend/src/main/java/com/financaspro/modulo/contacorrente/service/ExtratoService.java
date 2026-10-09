@@ -1,4 +1,4 @@
-package com.financaspro.service;
+package com.financaspro.modulo.contacorrente.service;
 
 import com.financaspro.builder.LancamentoBuilder;
 import com.financaspro.model.dto.CategoriaResumoDTO;
@@ -10,6 +10,7 @@ import com.financaspro.model.entity.Lancamento;
 import com.financaspro.repository.CategoriaRepository;
 import com.financaspro.repository.ContaBancariaRepository;
 import com.financaspro.repository.LancamentoRepository;
+import com.financaspro.service.ParametroService;
 import com.financaspro.utils.DateUtils;
 
 import com.financaspro.utils.ExcelGenerator;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import java.time.YearMonth;
@@ -48,8 +48,44 @@ public class ExtratoService {
         this.parametroService = parametroService;
     }
 
+    public List<String> listarMesesDisponiveis() {
+        List<LocalDateTime> datas = lancamentoRepository.findAllDataLancamento();
+        java.util.Set<String> setMeses = new java.util.LinkedHashSet<>();
+        for (LocalDateTime d : datas) {
+            setMeses.add(YearMonth.from(d).toString());
+        }
+        if (setMeses.isEmpty()) {
+            YearMonth cur = YearMonth.now();
+            for (int i = 0; i < 12; i++) {
+                setMeses.add(cur.minusMonths(i).toString());
+            }
+        }
+        return new ArrayList<>(setMeses);
+    }
+
+    public YearMonth resolverAnoMes(YearMonth anoMes) {
+        if (anoMes != null) {
+            return anoMes;
+        }
+        YearMonth agora = YearMonth.now();
+        LocalDateTime inicio = DateUtils.primeiroDiaMes(agora).atStartOfDay();
+        LocalDateTime fim = DateUtils.ultimoDiaMes(agora).atTime(23, 59, 59);
+
+        List<Lancamento> lancsHoje = lancamentoRepository.findByDataLancamentoBetweenOrderByDataLancamentoDesc(inicio, fim);
+        if (!lancsHoje.isEmpty()) {
+            return agora;
+        }
+
+        Optional<LocalDateTime> maxData = lancamentoRepository.findMaxDataLancamento();
+        if (maxData.isPresent()) {
+            return YearMonth.from(maxData.get());
+        }
+
+        return agora;
+    }
+
     public List<LancamentoDTO> listarLancamentosPorMes(YearMonth anoMes) {
-        YearMonth ym = (anoMes != null) ? anoMes : YearMonth.now();
+        YearMonth ym = resolverAnoMes(anoMes);
         LocalDateTime inicio = DateUtils.primeiroDiaMes(ym).atStartOfDay();
         LocalDateTime fim = DateUtils.ultimoDiaMes(ym).atTime(23, 59, 59);
 
@@ -93,7 +129,7 @@ public class ExtratoService {
     }
 
     public ResumoMensalDTO resumoMensal(YearMonth anoMes) {
-        YearMonth ym = (anoMes != null) ? anoMes : YearMonth.now();
+        YearMonth ym = resolverAnoMes(anoMes);
         LocalDateTime inicio = DateUtils.primeiroDiaMes(ym).atStartOfDay();
         LocalDateTime fim = DateUtils.ultimoDiaMes(ym).atTime(23, 59, 59);
 
@@ -103,10 +139,14 @@ public class ExtratoService {
         BigDecimal totalReceita = BigDecimal.ZERO;
 
         for (Lancamento l : lancamentos) {
-            if (l.getCategoria() != null && "RECEITA".equalsIgnoreCase(l.getCategoria().getTipo())) {
-                totalReceita = totalReceita.add(l.getValor().abs());
-            } else {
-                totalGasto = totalGasto.add(l.getValor().abs());
+            if (l.getValor() != null) {
+                boolean ehReceita = (l.getCategoria() != null && "RECEITA".equalsIgnoreCase(l.getCategoria().getTipo()))
+                        || (l.getValor().compareTo(BigDecimal.ZERO) > 0);
+                if (ehReceita) {
+                    totalReceita = totalReceita.add(l.getValor().abs());
+                } else {
+                    totalGasto = totalGasto.add(l.getValor().abs());
+                }
             }
         }
 

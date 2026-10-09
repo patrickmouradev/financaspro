@@ -1,0 +1,13 @@
+-- Migration V16: Adiciona colunas detalhadas de Renda Fixa na tabela de Ativo e Operacao
+
+ALTER TABLE ativo ADD COLUMN IF NOT EXISTS data_aplicacao DATE;
+ALTER TABLE ativo ADD COLUMN IF NOT EXISTS data_vencimento DATE;
+ALTER TABLE ativo ADD COLUMN IF NOT EXISTS liquidez VARCHAR(100);
+ALTER TABLE ativo ADD COLUMN IF NOT EXISTS porcentagem_taxa VARCHAR(100);
+ALTER TABLE ativo ADD COLUMN IF NOT EXISTS emissor VARCHAR(150);
+ALTER TABLE ativo ADD COLUMN IF NOT EXISTS cnpj_emissor VARCHAR(30);
+ALTER TABLE ativo ADD COLUMN IF NOT EXISTS produto VARCHAR(150);
+
+ALTER TABLE operacao ADD COLUMN IF NOT EXISTS data_vencimento DATE;
+ALTER TABLE operacao ADD COLUMN IF NOT EXISTS liquidez VARCHAR(100);
+ALTER TABLE operacao ADD COLUMN IF NOT EXISTS porcentagem_taxa VARCHAR(100);
