@@ -38,9 +38,16 @@ pipeline {
                 echo '=== Compilando o projeto com Maven ==='
                 dir('backend') {
                     sh '''
-                        export JAVA_HOME=/usr/lib/jvm/zulu25
-                        export PATH=$JAVA_HOME/bin:$PATH
-                        ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+                        if [ -d "/usr/lib/jvm/zulu21" ]; then
+                            export JAVA_HOME=/usr/lib/jvm/zulu21
+                        elif [ -d "/usr/lib/jvm/java-21-openjdk" ]; then
+                            export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+                        elif [ -d "/opt/java/openjdk" ]; then
+                            export JAVA_HOME=/opt/java/openjdk
+                        fi
+                        [ -n "$JAVA_HOME" ] && export PATH=$JAVA_HOME/bin:$PATH
+                        java -version
+                        mvn clean package -DskipTests
                     '''
                 }
             }
