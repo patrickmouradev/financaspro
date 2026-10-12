@@ -1,63 +1,109 @@
+// ============================================================
+// Jenkinsfile — Pipeline do Frontend (FinançasPro)
+// Trigger: Manual ou Webhook Git
+// ============================================================
 pipeline {
     agent any
 
     environment {
-        APP_NAME = 'frontendfinancaspro'
-        PORT_HML = '3004'
-        PORT_PRD = '3003'
+        // Configurações Docker
+        DOCKER_IMAGE    = 'patrickmoura/financaspro-front'
+        CONTAINER_NAME  = 'frontendfinancaspro'
+        APP_PORT        = '3004'
+        INTERNAL_PORT   = '3000'
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('🔍 Checkout') {
             steps {
+                echo '=== Clonando repositório ==='
                 checkout scm
             }
         }
 
-        stage('Build & Lint') {
+        stage('🛠️ Lint & Testes Locais') {
             steps {
+                echo '=== Validando código do frontend ==='
                 dir('frontend') {
-                    sh 'npm ci'
-                    sh 'npm run lint'
-                    sh 'npm run build'
+                    sh '''
+                        if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+                            echo "Node detectado no agent. Rodando lint..."
+                            [ -f .eslintrc.json ] || echo '{"extends":"next/core-web-vitals"}' > .eslintrc.json
+                            npm ci
+                            npm run lint
+                        else
+                            echo "Node.js não detectado no host do Jenkins. A compilação e validação ocorrerão no Docker Build."
+                        fi
+                    '''
                 }
             }
         }
 
-        stage('Build Docker Image') {
+        stage('🐳 Docker Build') {
             steps {
+                echo '=== Construindo imagem Docker do Frontend ==='
                 dir('frontend') {
-                    sh "docker build -t ${APP_NAME}:${env.BUILD_NUMBER} ."
-                    sh "docker tag ${APP_NAME}:${env.BUILD_NUMBER} ${APP_NAME}:latest"
+                    sh '''
+                        docker build \
+                            -t ${DOCKER_IMAGE}:latest \
+                            -t ${DOCKER_IMAGE}:${BUILD_NUMBER} \
+                            .
+                    '''
                 }
             }
         }
 
-        stage('Deploy HML') {
-            when {
-                branch 'master'
-            }
+        stage('🚀 Deploy') {
             steps {
-                sh "docker stop ${APP_NAME} || true"
-                sh "docker rm ${APP_NAME} || true"
-                sh "docker run -d --name ${APP_NAME} --network jenkins_jenkins_net -p ${PORT_HML}:3000 -e NEXT_PUBLIC_API_URL=http://localhost:8087 ${APP_NAME}:latest"
+                echo '=== Subindo container do Frontend no servidor ==='
+                sh '''
+                    OLD_CONTAINER=$(docker ps -q --filter "publish=${APP_PORT}")
+                    if [ -n "$OLD_CONTAINER" ]; then
+                        echo "Removendo container anterior na porta ${APP_PORT}..."
+                        docker stop $OLD_CONTAINER || true
+                        docker rm $OLD_CONTAINER || true
+                    fi
+
+                    docker stop ${CONTAINER_NAME} || true
+                    docker rm   ${CONTAINER_NAME} || true
+
+                    docker run \
+                        --name ${CONTAINER_NAME} \
+                        --network jenkins_jenkins_net \
+                        --restart=always \
+                        -d \
+                        -p ${APP_PORT}:${INTERNAL_PORT} \
+                        -e NODE_ENV=production \
+                        -e PORT=3000 \
+                        ${DOCKER_IMAGE}:latest
+                '''
             }
         }
 
-        stage('Deploy PRD') {
-            when {
-                branch 'production'
-            }
+        stage('✅ Health Check') {
             steps {
-                sh "docker stop ${APP_NAME}-prd || true"
-                sh "docker rm ${APP_NAME}-prd || true"
-                sh "docker run -d --name ${APP_NAME}-prd --network jenkins_jenkins_net -p ${PORT_PRD}:3000 -e NEXT_PUBLIC_API_URL=http://localhost:8087 ${APP_NAME}:latest"
+                echo '=== Verificando se o Frontend subiu ==='
+                sh '''
+                    sleep 10
+                    curl -f http://${CONTAINER_NAME}:3000 || \
+                        (echo "ERRO: Frontend não respondeu ao health check na rede interna!" && exit 1)
+                '''
             }
         }
     }
 
     post {
+        success {
+            echo "✅ Pipeline do Frontend concluída com sucesso! Build #${BUILD_NUMBER}"
+        }
+        failure {
+            echo "❌ Pipeline do Frontend FALHOU no build #${BUILD_NUMBER}. Verifique os logs."
+        }
         always {
+            script {
+                sh 'docker image prune -f 2>/dev/null || true'
+            }
             cleanWs()
         }
     }

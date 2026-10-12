@@ -9,18 +9,27 @@ Sistema corporativo completo para gestão de finanças pessoais, controle de fat
 - **Backend:** Java 21 · Spring Boot 3.3 · Spring Security (JWT) · Spring Data JPA · Flyway Migrations · Apache POI (Encryption/Decrypt) · iText 7 PDF · Maven
 - **Frontend:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · Recharts · Zustand · Axios · TanStack Query
 - **Banco de Dados:** PostgreSQL 15 (`192.168.15.10:5432` — database `financaspro`)
-- **Infraestrutura:** Docker · Docker Compose · Jenkins CI/CD · Portainer
+- **Infraestrutura:** Docker · Docker Compose · Jenkins CI/CD · Caddy (Proxy Reverso)
 - **Armazenamento de Arquivos:** `C:\ARQUIVOS_SITES\FINANCASPRO` no host (mapeado para `/app/uploads` no container)
 
 ---
 
-## 📌 Mapeamento de Portas e Serviços
+## 📌 Mapeamento de Portas, Serviços e Containers
 
-| Serviço | Ambiente HML | Ambiente PRD |
-|---|---|---|
-| **Backend (Spring Boot)** | `http://localhost:8087` | `http://localhost:8088` |
-| **Frontend (Next.js)** | `http://localhost:3004` | `http://localhost:3003` |
-| **PostgreSQL** | `192.168.15.10:5432` (db: `financaspro`) | `192.168.15.10:5432` (db: `financaspro`) |
+| Serviço | Nome Container | Ambiente HML | Ambiente PRD |
+|---|---|---|---|
+| **Backend (Spring Boot)** | `backendfinancaspro` | `http://localhost:8087` | `http://localhost:8087` |
+| **Frontend (Next.js)** | `frontendfinancaspro` | `http://localhost:3004` | `http://localhost:3003` |
+| **PostgreSQL** | — | `192.168.15.10:5432` (db: `financas`) | `192.168.15.10:5432` (db: `financas`) |
+
+---
+
+## 🌐 Proxy Reverso (Caddy)
+
+Os containers comunicam-se pela rede Docker externa `jenkins_jenkins_net`. O Caddy realiza o proxy reverso utilizando o nome amigável dos containers:
+
+- **Backend API**: Roteado para `http://backendfinancaspro:8087`
+- **Frontend App**: Roteado para `http://frontendfinancaspro:3000`
 
 ---
 
