@@ -3,7 +3,7 @@ spring:
     show-sql: false
 
 server:
-  port: 8088
+  port: ${PORT:8087}
 
 logging:
   level:

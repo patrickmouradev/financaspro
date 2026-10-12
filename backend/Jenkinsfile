@@ -87,7 +87,7 @@ pipeline {
                         --restart=always \
                         -v "${UPLOAD_VOLUME}" \
                         -d \
-                        -p ${APP_PORT}:8087 \
+                        -p 0.0.0.0:${APP_PORT}:8087 \
                         -e SPRING_PROFILES_ACTIVE=prd \
                         -e PORT=8087 \
                         -e DB_HOST="${DB_HOST}" \
@@ -108,9 +108,17 @@ pipeline {
             steps {
                 echo '=== Verificando se o Backend subiu ==='
                 sh '''
-                    sleep 20
-                    curl -f http://${CONTAINER_NAME}:8087/actuator/health || \
-                        (echo "ERRO: Backend não respondeu ao health check!" && exit 1)
+                    for i in $(seq 1 12); do
+                        if curl -fs http://${CONTAINER_NAME}:8087/actuator/health > /dev/null; then
+                            echo "Backend online e saudável!"
+                            exit 0
+                        fi
+                        echo "Aguardando inicialização do Backend (tentativa $i/12)..."
+                        sleep 5
+                    done
+                    echo "ERRO: Backend não respondeu ao health check! Últimos logs do container:"
+                    docker logs --tail 80 ${CONTAINER_NAME} || true
+                    exit 1
                 '''
             }
         }
