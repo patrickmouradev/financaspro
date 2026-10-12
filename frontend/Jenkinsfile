@@ -76,6 +76,7 @@ pipeline {
                         -p ${APP_PORT}:${INTERNAL_PORT} \
                         -e NODE_ENV=production \
                         -e PORT=3000 \
+                        -e HOSTNAME=0.0.0.0 \
                         ${DOCKER_IMAGE}:latest
                 '''
             }
