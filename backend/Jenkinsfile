@@ -87,7 +87,7 @@ pipeline {
                         --restart=always \
                         -v "${UPLOAD_VOLUME}" \
                         -d \
-                        -p 0.0.0.0:${APP_PORT}:8087 \
+                        -p ${APP_PORT}:8087 \
                         -e SPRING_PROFILES_ACTIVE=prd \
                         -e PORT=8087 \
                         -e DB_HOST="${DB_HOST}" \
