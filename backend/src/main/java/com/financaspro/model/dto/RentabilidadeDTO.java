@@ -30,6 +30,7 @@ public class RentabilidadeDTO {
     private BigDecimal lucroPrejuizo;
     private BigDecimal variacaoPercentual;
     private BigDecimal percentualCarteira;
+    private Boolean cotacaoEmTempoReal;
 
     // Campos adicionais de Renda Fixa
     private LocalDate dataAplicacao;

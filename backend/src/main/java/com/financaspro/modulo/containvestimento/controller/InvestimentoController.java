@@ -1,10 +1,12 @@
 package com.financaspro.modulo.containvestimento.controller;
 
 import com.financaspro.model.dto.CarteiraDTO;
+import com.financaspro.model.dto.CotacaoDetalheDTO;
 import com.financaspro.model.dto.RentabilidadeDTO;
 import com.financaspro.model.entity.Ativo;
 import com.financaspro.repository.AtivoRepository;
 import com.financaspro.modulo.containvestimento.service.RentabilidadeService;
+import com.financaspro.service.CotacaoMercadoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,11 +19,14 @@ public class InvestimentoController {
 
     private final RentabilidadeService rentabilidadeService;
     private final AtivoRepository ativoRepository;
+    private final CotacaoMercadoService cotacaoMercadoService;
 
     public InvestimentoController(RentabilidadeService rentabilidadeService,
-                                  AtivoRepository ativoRepository) {
+                                  AtivoRepository ativoRepository,
+                                  CotacaoMercadoService cotacaoMercadoService) {
         this.rentabilidadeService = rentabilidadeService;
         this.ativoRepository = ativoRepository;
+        this.cotacaoMercadoService = cotacaoMercadoService;
     }
 
     @GetMapping("/carteira")
@@ -40,5 +45,14 @@ public class InvestimentoController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(rentabilidade);
+    }
+
+    @GetMapping("/cotacao/{ticker}")
+    public ResponseEntity<CotacaoDetalheDTO> obterCotacaoMercado(@PathVariable String ticker) {
+        CotacaoDetalheDTO detalhe = cotacaoMercadoService.obterDetalhesCotacao(ticker);
+        if (detalhe == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(detalhe);
     }
 }

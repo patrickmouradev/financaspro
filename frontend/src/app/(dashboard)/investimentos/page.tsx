@@ -99,32 +99,32 @@ export default function InvestimentosPage() {
     { mes: 'Jul', carteira: 4.12, cdi: 3.40, ipca: 1.27 },
   ];
 
-  // Matriz de Taxonomia Detalhada solicitada pelo usuário (Categoria x Classe x Taxa Indexadora)
+  // Matriz de Taxonomia Detalhada solicitada pelo usuÃ¡rio (Categoria x Classe x Taxa Indexadora)
   const taxonomiaEspecialista = [
-    { categoria: 'Fundos Imobiliários', classe: 'Imobiliário (Geral)', indexador: 'IPCA / IGPM', descricao: 'Fundos de investimento imobiliário com foco em infraestrutura e ativos de tijolo/papel.' },
-    { categoria: 'Fundos Imobiliários', classe: 'Tijolo', indexador: 'IPCA', descricao: 'Shopping Centers, Galpões Logísticos, Lajes Corporativas (ex: XPML11, BTLG11, VISC11).' },
-    { categoria: 'Fundos Imobiliários', classe: 'Papel', indexador: 'CDI / IPCA', descricao: 'Títulos de crédito imobiliário (CRI) com amortização e correção inflacionária (ex: MXRF11, KNIP11).' },
-    { categoria: 'Renda Fixa', classe: 'CDB', indexador: 'CDI', descricao: 'Certificados de Depósito Bancário pós-fixados (% do CDI).' },
-    { categoria: 'Renda Fixa', classe: 'CDB', indexador: 'IPCA', descricao: 'CDBs atrelados à inflação (IPCA + Taxa Pré).' },
-    { categoria: 'Renda Fixa', classe: 'Tesouro Selic', indexador: 'SELIC', descricao: 'Títulos públicos federais pós-fixados da dívida pública.' },
-    { categoria: 'Renda Fixa', classe: 'CRA', indexador: 'CDI / IPCA', descricao: 'Certificados de Recebíveis do Agronegócio isentos de IRPF.' },
-    { categoria: 'Renda Fixa', classe: 'CRI', indexador: 'IPCA / CDI', descricao: 'Certificados de Recebíveis Imobiliários isentos de IRPF.' },
-    { categoria: 'Ações', classe: 'Blue Chips / Dividendos', indexador: 'Ibovespa', descricao: 'Empresas de grande porte com histórico sólido de pagamento de proventos (ex: PETR4, VALE3, WEGE3, ITUB4).' },
+    { categoria: 'Fundos ImobiliÃ¡rios', classe: 'ImobiliÃ¡rio (Geral)', indexador: 'IPCA / IGPM', descricao: 'Fundos de investimento imobiliÃ¡rio com foco em infraestrutura e ativos de tijolo/papel.' },
+    { categoria: 'Fundos ImobiliÃ¡rios', classe: 'Tijolo', indexador: 'IPCA', descricao: 'Shopping Centers, GalpÃµes LogÃ­sticos, Lajes Corporativas (ex: XPML11, BTLG11, VISC11).' },
+    { categoria: 'Fundos ImobiliÃ¡rios', classe: 'Papel', indexador: 'CDI / IPCA', descricao: 'TÃ­tulos de crÃ©dito imobiliÃ¡rio (CRI) com amortizaÃ§Ã£o e correÃ§Ã£o inflacionÃ¡ria (ex: MXRF11, KNIP11).' },
+    { categoria: 'Renda Fixa', classe: 'CDB', indexador: 'CDI', descricao: 'Certificados de DepÃ³sito BancÃ¡rio pÃ³s-fixados (% do CDI).' },
+    { categoria: 'Renda Fixa', classe: 'CDB', indexador: 'IPCA', descricao: 'CDBs atrelados Ã  inflaÃ§Ã£o (IPCA + Taxa PrÃ©).' },
+    { categoria: 'Renda Fixa', classe: 'Tesouro Selic', indexador: 'SELIC', descricao: 'TÃ­tulos pÃºblicos federais pÃ³s-fixados da dÃ­vida pÃºblica.' },
+    { categoria: 'Renda Fixa', classe: 'CRA', indexador: 'CDI / IPCA', descricao: 'Certificados de RecebÃ­veis do AgronegÃ³cio isentos de IRPF.' },
+    { categoria: 'Renda Fixa', classe: 'CRI', indexador: 'IPCA / CDI', descricao: 'Certificados de RecebÃ­veis ImobiliÃ¡rios isentos de IRPF.' },
+    { categoria: 'AÃ§Ãµes', classe: 'Blue Chips / Dividendos', indexador: 'Ibovespa', descricao: 'Empresas de grande porte com histÃ³rico sÃ³lido de pagamento de proventos (ex: PETR4, VALE3, WEGE3, ITUB4).' },
   ];
 
   return (
     <>
-      <Header title="Módulo de Conta Investimento & Carteira" />
+      <Header title="MÃ³dulo de Conta Investimento & Carteira" />
       <main className="p-8 space-y-6 max-w-7xl mx-auto">
         {/* Top Header & Navigation Tabs */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
           <div>
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-sky-600" />
-              Gestão de Conta Investimento & Taxonomia de Ativos
+              GestÃ£o de Conta Investimento & Taxonomia de Ativos
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              Controle de custódia, taxonomia detalhada por Categoria, Classe e Indexador (CDI/IPCA/Selic), apuração de proventos e rentabilidade real.
+              Controle de custÃ³dia, taxonomia detalhada por Categoria, Classe e Indexador (CDI/IPCA/Selic), apuraÃ§Ã£o de proventos e rentabilidade real.
             </p>
           </div>
 
@@ -138,7 +138,7 @@ export default function InvestimentosPage() {
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Custódia & Dividendos
+                CustÃ³dia & Dividendos
               </button>
               <button
                 onClick={() => setActiveTab('taxonomia')}
@@ -167,7 +167,7 @@ export default function InvestimentosPage() {
               className="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg text-xs flex items-center gap-2 shadow-md shadow-sky-600/20 shrink-0"
             >
               <Plus className="w-4 h-4" />
-              Nova Operação
+              Nova OperaÃ§Ã£o
             </button>
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function InvestimentosPage() {
         {/* Resumo da Carteira & KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-            <p className="text-xs font-semibold uppercase text-slate-400">Patrimônio Custodiado</p>
+            <p className="text-xs font-semibold uppercase text-slate-400">PatrimÃ´nio Custodiado</p>
             <h3 className="text-2xl font-bold text-slate-800 mt-1">
               R$ {(carteira?.valorTotalAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </h3>
@@ -185,7 +185,7 @@ export default function InvestimentosPage() {
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
             <p className="text-xs font-semibold uppercase text-slate-400">Proventos & Renda Passiva</p>
             <h3 className="text-2xl font-bold text-emerald-600 mt-1">
-              R$ {(projecaoMeta?.resumoMeta?.mediaRendaMensalAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mês
+              R$ {(projecaoMeta?.resumoMeta?.mediaRendaMensalAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mÃªs
             </h3>
             <p className="text-xs text-emerald-700 mt-1 font-semibold">
               {(projecaoMeta?.resumoMeta?.percentualConcluido || 0).toFixed(1)}% da Meta Mensal
@@ -193,13 +193,13 @@ export default function InvestimentosPage() {
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-            <p className="text-xs font-semibold uppercase text-slate-400">Lucro / Prejuízo</p>
+            <p className="text-xs font-semibold uppercase text-slate-400">Lucro / PrejuÃ­zo</p>
             <h3 className={`text-2xl font-bold mt-1 ${
               (carteira?.lucroPrejuizoTotal || 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'
             }`}>
               R$ {(carteira?.lucroPrejuizoTotal || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Variação da Posição</p>
+            <p className="text-xs text-slate-500 mt-1">VariaÃ§Ã£o da PosiÃ§Ã£o</p>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
@@ -216,12 +216,20 @@ export default function InvestimentosPage() {
           </div>
         </div>
 
-        {/* TAB 1: CUSTÓDIA & DIVIDENDOS POR PAPEL */}
+        {/* TAB 1: CUSTÃ“DIA & DIVIDENDOS POR PAPEL */}
         {activeTab === 'carteira' && (
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-slate-100 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-sky-600" />
-              <h3 className="font-bold text-slate-800 text-base">Posição de Ativos & Dividend Yield On Cost (YOC)</h3>
+            <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-sky-600" />
+                <h3 className="font-bold text-slate-800 text-base">PosiÃ§Ã£o de Ativos & Dividend Yield On Cost (YOC)</h3>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="flex items-center gap-1.5 font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  CotaÃ§Ãµes B3 Atualizadas via Internet
+                </span>
+              </div>
             </div>
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
@@ -230,11 +238,11 @@ export default function InvestimentosPage() {
                   <th className="px-6 py-3.5">Nome do Ativo</th>
                   <th className="px-6 py-3.5">Classe / Taxa</th>
                   <th className="px-6 py-3.5 text-right">Qtd Cotas</th>
-                  <th className="px-6 py-3.5 text-right">Preço Médio (c/ Taxas)</th>
-                  <th className="px-6 py-3.5 text-right">Cotação Atual</th>
+                  <th className="px-6 py-3.5 text-right">PreÃ§o MÃ©dio (c/ Taxas)</th>
+                  <th className="px-6 py-3.5 text-right">CotaÃ§Ã£o Atual</th>
                   <th className="px-6 py-3.5 text-right">Total Investido</th>
                   <th className="px-6 py-3.5 text-right">Valor Atual</th>
-                  <th className="px-6 py-3.5 text-right">Lucro/Prejuízo</th>
+                  <th className="px-6 py-3.5 text-right">Lucro/PrejuÃ­zo</th>
                   <th className="px-6 py-3.5 text-right">% Carteira</th>
                 </tr>
               </thead>
@@ -251,11 +259,25 @@ export default function InvestimentosPage() {
                       <td className="px-6 py-4 font-bold text-sky-700 font-mono">{item.ticker}</td>
                       <td className="px-6 py-4 font-medium text-slate-800">{item.nomeAtivo}</td>
                       <td className="px-6 py-4 text-xs font-semibold text-slate-600">
-                        {item.classe || 'FII / Ações'} <span className="text-slate-400 font-mono">({item.indexador || 'IPCA'})</span>
+                        {item.classe || 'FII / AÃ§Ãµes'} <span className="text-slate-400 font-mono">({item.indexador || 'IPCA'})</span>
                       </td>
                       <td className="px-6 py-4 text-right font-mono">{item.quantidadeAtual}</td>
                       <td className="px-6 py-4 text-right font-mono">R$ {item.precoMedio.toFixed(2)}</td>
-                      <td className="px-6 py-4 text-right font-mono">R$ {item.precoAtual.toFixed(2)}</td>
+                      <td className="px-6 py-4 text-right font-mono whitespace-nowrap">
+                        <div className="font-bold text-slate-900">
+                          R$ {item.precoAtual.toFixed(2)}
+                        </div>
+                        {item.cotacaoEmTempoReal ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-sans font-semibold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Ao Vivo B3
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-slate-400 font-sans">
+                            PreÃ§o MÃ©dio
+                          </span>
+                        )}
+                      </td>
                       <td className="px-6 py-4 text-right font-mono text-slate-700">R$ {item.valorTotalInvestido.toFixed(2)}</td>
                       <td className="px-6 py-4 text-right font-mono font-bold text-slate-900">R$ {item.valorAtual.toFixed(2)}</td>
                       <td className={`px-6 py-4 text-right font-bold font-mono ${item.lucroPrejuizo >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
@@ -281,7 +303,7 @@ export default function InvestimentosPage() {
                     Taxonomia do Mercado Financeiro: Categoria x Classe x Taxa Indexadora
                   </h3>
                   <p className="text-xs text-slate-500 mt-1">
-                    Estrutura de classificação utilizada para balanceamento de carteira, análise de risco e comparativo de indexadores (CDI / IPCA / Selic).
+                    Estrutura de classificaÃ§Ã£o utilizada para balanceamento de carteira, anÃ¡lise de risco e comparativo de indexadores (CDI / IPCA / Selic).
                   </p>
                 </div>
               </div>
@@ -292,7 +314,7 @@ export default function InvestimentosPage() {
                     <th className="px-6 py-3.5">Categoria</th>
                     <th className="px-6 py-3.5">Classe</th>
                     <th className="px-6 py-3.5">Taxa Indexadora</th>
-                    <th className="px-6 py-3.5">Descrição / Ativos Relevantes</th>
+                    <th className="px-6 py-3.5">DescriÃ§Ã£o / Ativos Relevantes</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -300,7 +322,7 @@ export default function InvestimentosPage() {
                     <tr key={idx} className="hover:bg-slate-50/50">
                       <td className="px-6 py-4 font-bold text-slate-800">
                         <span className={`px-2.5 py-1 rounded-md text-xs font-bold border ${
-                          item.categoria === 'Fundos Imobiliários'
+                          item.categoria === 'Fundos ImobiliÃ¡rios'
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                             : item.categoria === 'Renda Fixa'
                             ? 'bg-amber-50 text-amber-700 border-amber-200'
@@ -311,7 +333,7 @@ export default function InvestimentosPage() {
                       </td>
                       <td className="px-6 py-4 font-semibold text-slate-700">{item.classe}</td>
                       <td className="px-6 py-4 font-mono text-xs font-bold text-sky-700">
-                        {item.indexador || '—'}
+                        {item.indexador || 'â€”'}
                       </td>
                       <td className="px-6 py-4 text-xs text-slate-500">
                         {item.descricao}
@@ -322,11 +344,11 @@ export default function InvestimentosPage() {
               </table>
             </div>
 
-            {/* Cadastro de Ativos Existentes com Suporte à Taxonomia */}
+            {/* Cadastro de Ativos Existentes com Suporte Ã  Taxonomia */}
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
               <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
                 <Layers className="w-5 h-5 text-sky-600" />
-                Catálogo de Ativos Cadastrados no Banco de Dados
+                CatÃ¡logo de Ativos Cadastrados no Banco de Dados
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -338,7 +360,7 @@ export default function InvestimentosPage() {
                     </div>
                     <p className="text-xs font-medium text-slate-800">{at.nome}</p>
                     <div className="text-xs text-slate-500 flex flex-wrap gap-2 pt-1 border-t border-slate-200">
-                      <span><strong>Categoria:</strong> {at.categoriaNome || 'Fundos Imobiliários'}</span>
+                      <span><strong>Categoria:</strong> {at.categoriaNome || 'Fundos ImobiliÃ¡rios'}</span>
                       <span><strong>Classe:</strong> {at.classe || 'Tijolo'}</span>
                       <span><strong>Indexador:</strong> {at.indexador || 'IPCA'}</span>
                     </div>
@@ -355,7 +377,7 @@ export default function InvestimentosPage() {
             <div>
               <h3 className="font-bold text-slate-800 text-base">Benchmarking de Rentabilidade: Carteira vs CDI vs IPCA</h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Acompanhe o Ganho Real acima da inflação e o percentual em relação à taxa CDI de mercado.
+                Acompanhe o Ganho Real acima da inflaÃ§Ã£o e o percentual em relaÃ§Ã£o Ã  taxa CDI de mercado.
               </p>
             </div>
 
@@ -367,18 +389,18 @@ export default function InvestimentosPage() {
                   <Tooltip formatter={(val: number) => `${val.toFixed(2)}%`} />
                   <Line type="monotone" dataKey="carteira" name="Sua Carteira (%)" stroke="#0284c7" strokeWidth={3} />
                   <Line type="monotone" dataKey="cdi" name="CDI (%)" stroke="#10b981" strokeWidth={2} strokeDasharray="4 4" />
-                  <Line type="monotone" dataKey="ipca" name="IPCA Inflação (%)" stroke="#ef4444" strokeWidth={2} strokeDasharray="2 2" />
+                  <Line type="monotone" dataKey="ipca" name="IPCA InflaÃ§Ã£o (%)" stroke="#ef4444" strokeWidth={2} strokeDasharray="2 2" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
         )}
 
-        {/* Modal Registrar Operação */}
+        {/* Modal Registrar OperaÃ§Ã£o */}
         {showModal && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-              <h3 className="font-bold text-slate-800 text-lg">Registrar Operação de Ativo</h3>
+              <h3 className="font-bold text-slate-800 text-lg">Registrar OperaÃ§Ã£o de Ativo</h3>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -392,7 +414,7 @@ export default function InvestimentosPage() {
                     <option value="">Selecione o ativo...</option>
                     {ativos.map((at: any) => (
                       <option key={at.id} value={at.id}>
-                        {at.ticker} — {at.nome}
+                        {at.ticker} â€” {at.nome}
                       </option>
                     ))}
                   </select>
@@ -411,7 +433,7 @@ export default function InvestimentosPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">Data Pregão</label>
+                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">Data PregÃ£o</label>
                     <input
                       type="date"
                       value={dataOperacao}
@@ -435,7 +457,7 @@ export default function InvestimentosPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">Preço R$</label>
+                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">PreÃ§o R$</label>
                     <input
                       type="number"
                       step="0.01"
@@ -469,7 +491,7 @@ export default function InvestimentosPage() {
                     type="submit"
                     className="flex-1 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg text-sm"
                   >
-                    Salvar Operação
+                    Salvar OperaÃ§Ã£o
                   </button>
                 </div>
               </form>

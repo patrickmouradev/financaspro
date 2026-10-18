@@ -13,6 +13,7 @@ import com.financaspro.repository.OperacaoRepository;
 import com.financaspro.service.CotacaoMercadoService;
 import com.financaspro.utils.MoedaUtils;
 import com.financaspro.utils.PercentualUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -44,6 +45,7 @@ public class MetaDividendoService {
         this(fiiRepository, dividendoRepository, lancamentoRepository, operacaoRepository, fiiService, new CotacaoMercadoService());
     }
 
+    @Autowired
     public MetaDividendoService(
             FiiRepository fiiRepository,
             DividendoRepository dividendoRepository,
@@ -107,7 +109,7 @@ public class MetaDividendoService {
 
             BigDecimal pm = (fii.getPrecoMedio() != null) ? fii.getPrecoMedio() : BigDecimal.ZERO;
 
-            // Busca preço real de mercado atualizado via B3 / Yahoo Finance
+            // Busca preÃ§o real de mercado atualizado via B3 / Yahoo Finance
             BigDecimal precoMercado = cotacaoMercadoService.obterCotacaoAtual(fii.getTicker());
             boolean cotacaoReal = (precoMercado != null && precoMercado.compareTo(BigDecimal.ZERO) > 0);
             BigDecimal precoAtual = cotacaoReal ? precoMercado : pm;
@@ -115,7 +117,7 @@ public class MetaDividendoService {
             BigDecimal valorTotalInvestido = MoedaUtils.arredondar2Casas(fii.getQuantidadeCotas().multiply(pm));
             BigDecimal valorAtualTotal = MoedaUtils.arredondar2Casas(fii.getQuantidadeCotas().multiply(precoAtual));
 
-            // Regra Financeira: Relação Preço Atual vs Rendimento Médio
+            // Regra Financeira: RelaÃ§Ã£o PreÃ§o Atual vs Rendimento MÃ©dio
             BigDecimal dyMensal = BigDecimal.ZERO;
             BigDecimal dyAnual = BigDecimal.ZERO;
             BigDecimal custo1Real = BigDecimal.ZERO;
@@ -149,7 +151,7 @@ public class MetaDividendoService {
                     .build());
         }
 
-        // Classificação e Ranking Automático: Qual ativo vale mais a pena comprar?
+        // ClassificaÃ§Ã£o e Ranking AutomÃ¡tico: Qual ativo vale mais a pena comprar?
         List<ProjecaoMetaDTO.ProjecaoFiiItemDTO> rankeaveis = itens.stream()
                 .filter(i -> i.getDividendYieldMensalAtual() != null && i.getDividendYieldMensalAtual().compareTo(BigDecimal.ZERO) > 0)
                 .sorted((a, b) -> b.getDividendYieldMensalAtual().compareTo(a.getDividendYieldMensalAtual()))
@@ -159,17 +161,17 @@ public class MetaDividendoService {
         for (ProjecaoMetaDTO.ProjecaoFiiItemDTO item : rankeaveis) {
             item.setRankingOportunidade(rank);
             if (rank == 1) {
-                item.setClassificacaoCompra("1º - MELHOR OPÇÃO");
-                item.setRecomendacaoCompra("Menor custo para gerar R$ 1,00/mês de renda (" + item.getDividendYieldMensalAtual() + "% a.m.)");
+                item.setClassificacaoCompra("1Âº - MELHOR OPÃ‡ÃƒO");
+                item.setRecomendacaoCompra("Menor custo para gerar R$ 1,00/mÃªs de renda (" + item.getDividendYieldMensalAtual() + "% a.m.)");
             } else if (rank == 2) {
-                item.setClassificacaoCompra("2º - ÓTIMA COMPRA");
-                item.setRecomendacaoCompra("Excelente retorno sobre a cotação atual (" + item.getDividendYieldMensalAtual() + "% a.m.)");
+                item.setClassificacaoCompra("2Âº - Ã“TIMA COMPRA");
+                item.setRecomendacaoCompra("Excelente retorno sobre a cotaÃ§Ã£o atual (" + item.getDividendYieldMensalAtual() + "% a.m.)");
             } else if (rank == 3) {
-                item.setClassificacaoCompra("3º - BOA COMPRA");
-                item.setRecomendacaoCompra("Boa relação rendimento/preço de mercado (" + item.getDividendYieldMensalAtual() + "% a.m.)");
+                item.setClassificacaoCompra("3Âº - BOA COMPRA");
+                item.setRecomendacaoCompra("Boa relaÃ§Ã£o rendimento/preÃ§o de mercado (" + item.getDividendYieldMensalAtual() + "% a.m.)");
             } else {
-                item.setClassificacaoCompra(rank + "º - MODERADO");
-                item.setRecomendacaoCompra("Retorno regular sobre o preço (" + item.getDividendYieldMensalAtual() + "% a.m.)");
+                item.setClassificacaoCompra(rank + "Âº - MODERADO");
+                item.setRecomendacaoCompra("Retorno regular sobre o preÃ§o (" + item.getDividendYieldMensalAtual() + "% a.m.)");
             }
             rank++;
         }
@@ -177,7 +179,7 @@ public class MetaDividendoService {
         for (ProjecaoMetaDTO.ProjecaoFiiItemDTO i : itens) {
             if (i.getRankingOportunidade() == null) {
                 i.setClassificacaoCompra("SEM PROVENTOS");
-                i.setRecomendacaoCompra("Aguardando histórico de dividendos para análise");
+                i.setRecomendacaoCompra("Aguardando histÃ³rico de dividendos para anÃ¡lise");
             }
         }
 
@@ -274,10 +276,10 @@ public class MetaDividendoService {
 
             BigDecimal taxas = BigDecimal.ZERO;
             if (l.getObservacao() != null) {
-                if (l.getObservacao().contains("Preço Médio Ajustado com Taxas B3: R$ ")) {
+                if (l.getObservacao().contains("PreÃ§o MÃ©dio Ajustado com Taxas B3: R$ ")) {
                     try {
-                        int idx = l.getObservacao().indexOf("Preço Médio Ajustado com Taxas B3: R$ ");
-                        String valStr = l.getObservacao().substring(idx + "Preço Médio Ajustado com Taxas B3: R$ ".length()).trim();
+                        int idx = l.getObservacao().indexOf("PreÃ§o MÃ©dio Ajustado com Taxas B3: R$ ");
+                        String valStr = l.getObservacao().substring(idx + "PreÃ§o MÃ©dio Ajustado com Taxas B3: R$ ".length()).trim();
                         pmAjustado = new BigDecimal(valStr.replace(",", "."));
                     } catch (Exception ignored) {}
                 }
@@ -315,3 +317,4 @@ public class MetaDividendoService {
         return compras;
     }
 }
+

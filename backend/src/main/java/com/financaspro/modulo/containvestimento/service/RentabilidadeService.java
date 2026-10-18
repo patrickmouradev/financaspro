@@ -7,40 +7,43 @@ import com.financaspro.model.entity.Operacao;
 import com.financaspro.model.enums.TipoOperacao;
 import com.financaspro.repository.AtivoRepository;
 import com.financaspro.repository.OperacaoRepository;
+import com.financaspro.service.CotacaoMercadoService;
 import com.financaspro.utils.MoedaUtils;
 import com.financaspro.utils.PercentualUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class RentabilidadeService {
 
     private static final Logger log = LoggerFactory.getLogger(RentabilidadeService.class);
-    private static final String BRAPI_URL = "https://brapi.dev/api/quote/{ticker}";
 
     private final AtivoRepository ativoRepository;
     private final OperacaoRepository operacaoRepository;
-    private final RestTemplate restTemplate;
+    private final CotacaoMercadoService cotacaoMercadoService;
 
+    @Autowired
+    public RentabilidadeService(AtivoRepository ativoRepository,
+                                OperacaoRepository operacaoRepository,
+                                CotacaoMercadoService cotacaoMercadoService) {
+        this.ativoRepository = ativoRepository;
+        this.operacaoRepository = operacaoRepository;
+        this.cotacaoMercadoService = cotacaoMercadoService;
+    }
+
+    // Construtor de compatibilidade para testes legados
     public RentabilidadeService(AtivoRepository ativoRepository,
                                 OperacaoRepository operacaoRepository,
                                 RestTemplateBuilder restTemplateBuilder) {
-        this.ativoRepository = ativoRepository;
-        this.operacaoRepository = operacaoRepository;
-        this.restTemplate = restTemplateBuilder
-                .setConnectTimeout(Duration.ofSeconds(3))
-                .setReadTimeout(Duration.ofSeconds(3))
-                .build();
+        this(ativoRepository, operacaoRepository, new CotacaoMercadoService());
     }
 
     public CarteiraDTO calcularCarteira() {
@@ -119,10 +122,10 @@ public class RentabilidadeService {
             return null;
         }
 
-        BigDecimal precoAtual = buscarCotacaoBrapi(ativo.getTicker());
-        if (precoAtual == null) {
-            precoAtual = precoMedio;
-        }
+        // Busca cotação atualizada na internet via Yahoo Finance / BRAPI
+        BigDecimal precoMercado = cotacaoMercadoService.obterCotacaoAtual(ativo.getTicker());
+        boolean cotacaoReal = (precoMercado != null && precoMercado.compareTo(BigDecimal.ZERO) > 0);
+        BigDecimal precoAtual = cotacaoReal ? precoMercado : precoMedio;
 
         BigDecimal valorTotalInvestido = quantidadeAtual.multiply(precoMedio);
         BigDecimal valorAtual = quantidadeAtual.multiply(precoAtual);
@@ -156,6 +159,7 @@ public class RentabilidadeService {
                 .lucroPrejuizo(MoedaUtils.arredondar2Casas(lucroPrejuizo))
                 .variacaoPercentual(variacao)
                 .percentualCarteira(BigDecimal.ZERO)
+                .cotacaoEmTempoReal(cotacaoReal)
                 .dataAplicacao(ativo.getDataAplicacao())
                 .dataVencimento(ativo.getDataVencimento())
                 .liquidez(ativo.getLiquidez())
@@ -166,25 +170,5 @@ public class RentabilidadeService {
                 .diasAteVencimento(diasAteVencimento)
                 .statusVencimento(statusVencimento)
                 .build();
-    }
-
-    @SuppressWarnings("unchecked")
-    public BigDecimal buscarCotacaoBrapi(String ticker) {
-        try {
-            Map<String, Object> response = restTemplate.getForObject(BRAPI_URL, Map.class, ticker);
-            if (response != null && response.containsKey("results")) {
-                List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
-                if (results != null && !results.isEmpty()) {
-                    Map<String, Object> first = results.get(0);
-                    Object priceObj = first.get("regularMarketPrice");
-                    if (priceObj != null) {
-                        return new BigDecimal(priceObj.toString());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.warn("Não foi possível buscar cotação para ticker {} via BRAPI: {}", ticker, e.getMessage());
-        }
-        return null;
     }
 }
