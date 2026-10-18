@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Fragment } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Header';
 import api from '@/lib/axios';
@@ -200,23 +200,22 @@ export default function FiisPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm border-collapse">
               <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
                 <tr>
-                  <th className="w-8 px-3 py-3"></th>
-                  <th className="px-3 py-3">Ticker</th>
-                  <th className="px-3 py-3">Nome</th>
-                  <th className="px-3 py-3 text-right">Qtd</th>
-                  <th className="px-3 py-3 text-right">Preço Médio</th>
-                  <th className="px-3 py-3 text-right">Preço Atual</th>
-                  <th className="px-3 py-3 text-right">Rend./Cota</th>
-                  {/* NOVA COLUNA SOLICITADA */}
-                  <th className="px-4 py-3 text-center bg-emerald-50/70 border-x border-emerald-100 text-emerald-900 font-bold">
-                    Classificação / Vale a Pena?
+                  <th className="w-10 px-3 py-3 text-center"></th>
+                  <th className="px-3 py-3 font-semibold whitespace-nowrap">Ticker</th>
+                  <th className="px-3 py-3 font-semibold">Nome</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Qtd</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Preço Médio</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Preço Atual</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Rend./Cota</th>
+                  <th className="px-4 py-3 text-center bg-emerald-50/70 border-x border-emerald-100 text-emerald-900 font-bold whitespace-nowrap">
+                    Classificação / Oportunidade
                   </th>
-                  <th className="px-3 py-3 text-right">Total Investido</th>
-                  <th className="px-3 py-3 text-right">Renda Mensal</th>
-                  <th className="px-3 py-3 text-right">Aporte Estimado</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Total Investido</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Renda Mensal</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Aporte Estimado</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -239,33 +238,33 @@ export default function FiisPage() {
                     const rank = item.rankingOportunidade;
 
                     return (
-                      <tbody key={item.ticker} className="divide-y divide-slate-100">
+                      <Fragment key={item.ticker}>
                         <tr
                           onClick={() => toggleAccordion(item.ticker)}
                           className={`cursor-pointer transition-colors ${
                             isExpanded ? 'bg-sky-50/50 hover:bg-sky-50' : 'hover:bg-slate-50/70'
                           }`}
                         >
-                          <td className="px-3 py-4 text-slate-400">
+                          <td className="w-10 px-3 py-4 text-center text-slate-400">
                             {isExpanded ? (
-                              <ChevronDown className="w-4 h-4 text-sky-600" />
+                              <ChevronDown className="w-4 h-4 text-sky-600 inline-block" />
                             ) : (
-                              <ChevronRight className="w-4 h-4 text-slate-400" />
+                              <ChevronRight className="w-4 h-4 text-slate-400 inline-block" />
                             )}
                           </td>
-                          <td className="px-3 py-4 font-bold text-sky-700 font-mono">
+                          <td className="px-3 py-4 font-bold text-sky-700 font-mono whitespace-nowrap">
                             {item.ticker}
                           </td>
-                          <td className="px-3 py-4 font-medium text-slate-800 text-xs max-w-[180px] truncate" title={item.nome}>
+                          <td className="px-3 py-4 font-medium text-slate-800 text-xs max-w-[170px] truncate" title={item.nome}>
                             {item.nome}
                           </td>
-                          <td className="px-3 py-4 text-right font-mono font-semibold text-slate-900">
+                          <td className="px-3 py-4 text-right font-mono font-semibold text-slate-900 whitespace-nowrap">
                             {item.cotasAtuais}
                           </td>
-                          <td className="px-3 py-4 text-right font-mono text-slate-600">
+                          <td className="px-3 py-4 text-right font-mono text-slate-600 whitespace-nowrap">
                             R$ {(item.precoMedio || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
-                          <td className="px-3 py-4 text-right font-mono">
+                          <td className="px-3 py-4 text-right font-mono whitespace-nowrap">
                             <div className="font-bold text-slate-900">
                               R$ {(item.precoAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </div>
@@ -276,79 +275,85 @@ export default function FiisPage() {
                               </span>
                             )}
                           </td>
-                          <td className="px-3 py-4 text-right font-mono text-slate-600">
+                          <td className="px-3 py-4 text-right font-mono text-slate-600 whitespace-nowrap">
                             R$ {(item.dividendoMedioPorCota || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
 
-                          {/* NOVA COLUNA: CLASSIFICAÇÃO FINANCEIRA DE COMPRA */}
-                          <td className="px-4 py-3 text-center bg-emerald-50/40 border-x border-emerald-100">
+                          {/* COLUNA: CLASSIFICAÇÃO FINANCEIRA DE COMPRA */}
+                          <td className="px-4 py-3 text-center bg-emerald-50/40 border-x border-emerald-100 whitespace-nowrap">
                             {rank === 1 && (
                               <div className="inline-flex flex-col items-center">
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs font-black shadow-xs">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs font-black shadow-xs whitespace-nowrap">
                                   🥇 1º - MELHOR OPÇÃO
                                 </span>
-                                <span className="text-[11px] font-bold text-emerald-700 mt-1">
-                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m. ({item.dividendYieldAnualizado?.toFixed(1)}% a.a.)
+                                <span className="text-[11px] font-bold text-emerald-700 mt-1 whitespace-nowrap">
+                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m. {item.dividendYieldAnualizado ? `(${item.dividendYieldAnualizado.toFixed(1)}% a.a.)` : ''}
                                 </span>
-                                <span className="text-[10px] text-slate-500 font-mono">
-                                  R$ {item.custoParaUmRealRenda?.toFixed(2)} p/ R$ 1 renda
-                                </span>
+                                {item.custoParaUmRealRenda != null && (
+                                  <span className="text-[10px] text-slate-500 font-mono whitespace-nowrap">
+                                    R$ {item.custoParaUmRealRenda.toFixed(2)} p/ R$ 1 renda
+                                  </span>
+                                )}
                               </div>
                             )}
 
                             {rank === 2 && (
                               <div className="inline-flex flex-col items-center">
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-800 border border-slate-300 rounded-lg text-xs font-bold">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-800 border border-slate-300 rounded-lg text-xs font-bold whitespace-nowrap">
                                   🥈 2º - ÓTIMA COMPRA
                                 </span>
-                                <span className="text-[11px] font-bold text-emerald-700 mt-1">
+                                <span className="text-[11px] font-bold text-emerald-700 mt-1 whitespace-nowrap">
                                   DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m.
                                 </span>
-                                <span className="text-[10px] text-slate-500 font-mono">
-                                  R$ {item.custoParaUmRealRenda?.toFixed(2)} p/ R$ 1 renda
-                                </span>
+                                {item.custoParaUmRealRenda != null && (
+                                  <span className="text-[10px] text-slate-500 font-mono whitespace-nowrap">
+                                    R$ {item.custoParaUmRealRenda.toFixed(2)} p/ R$ 1 renda
+                                  </span>
+                                )}
                               </div>
                             )}
 
                             {rank === 3 && (
                               <div className="inline-flex flex-col items-center">
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold whitespace-nowrap">
                                   🥉 3º - BOA COMPRA
                                 </span>
-                                <span className="text-[11px] font-bold text-emerald-700 mt-1">
+                                <span className="text-[11px] font-bold text-emerald-700 mt-1 whitespace-nowrap">
                                   DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m.
                                 </span>
-                                <span className="text-[10px] text-slate-500 font-mono">
-                                  R$ {item.custoParaUmRealRenda?.toFixed(2)} p/ R$ 1 renda
-                                </span>
+                                {item.custoParaUmRealRenda != null && (
+                                  <span className="text-[10px] text-slate-500 font-mono whitespace-nowrap">
+                                    R$ {item.custoParaUmRealRenda.toFixed(2)} p/ R$ 1 renda
+                                  </span>
+                                )}
                               </div>
                             )}
 
                             {rank && rank > 3 && (
                               <div className="inline-flex flex-col items-center">
-                                <span className="inline-flex items-center px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs font-medium">
+                                <span className="inline-flex items-center px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs font-medium whitespace-nowrap">
                                   {rank}º - MODERADO
                                 </span>
-                                <span className="text-[11px] font-semibold text-slate-600 mt-0.5">
+                                <span className="text-[11px] font-semibold text-slate-600 mt-0.5 whitespace-nowrap">
                                   DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m.
                                 </span>
                               </div>
                             )}
 
                             {!rank && (
-                              <span className="text-xs text-slate-400">
+                              <span className="text-xs text-slate-400 whitespace-nowrap">
                                 Sem Histórico
                               </span>
                             )}
                           </td>
 
-                          <td className="px-3 py-4 text-right font-mono font-bold text-slate-900">
+                          <td className="px-3 py-4 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
                             R$ {(item.valorTotalInvestido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
-                          <td className="px-3 py-4 text-right font-mono font-bold text-emerald-600">
+                          <td className="px-3 py-4 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">
                             R$ {(item.rendimentoMensalAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
-                          <td className="px-3 py-4 text-right font-mono font-bold text-slate-900">
+                          <td className="px-3 py-4 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
                             R$ {(item.investimentoEstimadoNecessario || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
                         </tr>
@@ -420,7 +425,7 @@ export default function FiisPage() {
                             </td>
                           </tr>
                         )}
-                      </tbody>
+                      </Fragment>
                     );
                   })
                 )}
