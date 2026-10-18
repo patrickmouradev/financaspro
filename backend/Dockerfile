@@ -24,7 +24,7 @@ RUN addgroup -S financaspro && adduser -S financaspro -G financaspro
 USER financaspro:financaspro
 
 # Copia o artefato .jar compilado
-COPY --from=builder /app/target/financaspro-backend-1.0.0-SNAPSHOT.jar app.jar
+COPY --from=builder /app/target/app.jar app.jar
 
 # Exposição da porta 8087
 EXPOSE 8087
