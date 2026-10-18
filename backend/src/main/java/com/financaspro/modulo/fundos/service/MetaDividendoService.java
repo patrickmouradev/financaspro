@@ -10,6 +10,7 @@ import com.financaspro.repository.DividendoRepository;
 import com.financaspro.repository.FiiRepository;
 import com.financaspro.repository.LancamentoRepository;
 import com.financaspro.repository.OperacaoRepository;
+import com.financaspro.service.CotacaoMercadoService;
 import com.financaspro.utils.MoedaUtils;
 import com.financaspro.utils.PercentualUtils;
 import org.springframework.stereotype.Service;
@@ -25,14 +26,14 @@ import java.util.regex.Pattern;
 @Service
 public class MetaDividendoService {
 
-    private static final Pattern PATTERN_TICKER = Pattern.compile("\\b([A-Z]{4}11[B]?)\\b", Pattern.CASE_INSENSITIVE);
-    private static final Pattern PATTERN_QTD = Pattern.compile("QTD:\\s*(\\d+(?:[.,]\\d+)?)", Pattern.CASE_INSENSITIVE);
-
     private final FiiRepository fiiRepository;
     private final DividendoRepository dividendoRepository;
-    private final FiiService fiiService;
     private final LancamentoRepository lancamentoRepository;
     private final OperacaoRepository operacaoRepository;
+    private final FiiService fiiService;
+    private final CotacaoMercadoService cotacaoMercadoService;
+
+    private static final Pattern PATTERN_QTD = Pattern.compile("QTD:\\s*(\\d+(?:[.,]\\d+)?)", Pattern.CASE_INSENSITIVE);
 
     public MetaDividendoService(
             FiiRepository fiiRepository,
@@ -40,14 +41,33 @@ public class MetaDividendoService {
             FiiService fiiService,
             LancamentoRepository lancamentoRepository,
             OperacaoRepository operacaoRepository) {
+        this(fiiRepository, dividendoRepository, lancamentoRepository, operacaoRepository, fiiService, new CotacaoMercadoService());
+    }
+
+    public MetaDividendoService(
+            FiiRepository fiiRepository,
+            DividendoRepository dividendoRepository,
+            LancamentoRepository lancamentoRepository,
+            OperacaoRepository operacaoRepository,
+            FiiService fiiService,
+            CotacaoMercadoService cotacaoMercadoService) {
         this.fiiRepository = fiiRepository;
         this.dividendoRepository = dividendoRepository;
-        this.fiiService = fiiService;
         this.lancamentoRepository = lancamentoRepository;
         this.operacaoRepository = operacaoRepository;
+        this.fiiService = fiiService;
+        this.cotacaoMercadoService = cotacaoMercadoService;
     }
 
     public ProjecaoMetaDTO calcularProgressoEMeta(BigDecimal metaMensal) {
+        return calcularProjecaoMetaInterna(metaMensal);
+    }
+
+    public ProjecaoMetaDTO calcularProjecaoMeta(BigDecimal metaMensal) {
+        return calcularProjecaoMetaInterna(metaMensal);
+    }
+
+    private ProjecaoMetaDTO calcularProjecaoMetaInterna(BigDecimal metaMensal) {
         if (metaMensal == null || metaMensal.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("A meta de renda mensal deve ser maior que 0.");
         }
@@ -86,9 +106,25 @@ public class MetaDividendoService {
             rendaMensalAtualTotal = rendaMensalAtualTotal.add(rendimentoMensalFii);
 
             BigDecimal pm = (fii.getPrecoMedio() != null) ? fii.getPrecoMedio() : BigDecimal.ZERO;
-            BigDecimal precoAtual = pm;
+
+            // Busca preço real de mercado atualizado via B3 / Yahoo Finance
+            BigDecimal precoMercado = cotacaoMercadoService.obterCotacaoAtual(fii.getTicker());
+            boolean cotacaoReal = (precoMercado != null && precoMercado.compareTo(BigDecimal.ZERO) > 0);
+            BigDecimal precoAtual = cotacaoReal ? precoMercado : pm;
+
             BigDecimal valorTotalInvestido = MoedaUtils.arredondar2Casas(fii.getQuantidadeCotas().multiply(pm));
             BigDecimal valorAtualTotal = MoedaUtils.arredondar2Casas(fii.getQuantidadeCotas().multiply(precoAtual));
+
+            // Regra Financeira: Relação Preço Atual vs Rendimento Médio
+            BigDecimal dyMensal = BigDecimal.ZERO;
+            BigDecimal dyAnual = BigDecimal.ZERO;
+            BigDecimal custo1Real = BigDecimal.ZERO;
+
+            if (precoAtual.compareTo(BigDecimal.ZERO) > 0 && divMedioPorCota != null && divMedioPorCota.compareTo(BigDecimal.ZERO) > 0) {
+                dyMensal = divMedioPorCota.divide(precoAtual, 6, RoundingMode.HALF_UP).multiply(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP);
+                dyAnual = dyMensal.multiply(new BigDecimal("12")).setScale(2, RoundingMode.HALF_UP);
+                custo1Real = precoAtual.divide(divMedioPorCota, 2, RoundingMode.HALF_UP);
+            }
 
             List<ProjecaoMetaDTO.OperacaoCompraItemDTO> compras = buscarComprasDoTicker(fii.getTicker(), todosLancamentos);
 
@@ -106,7 +142,43 @@ public class MetaDividendoService {
                     .cotasFaltantesParaMetaTotal(BigDecimal.ZERO)
                     .investimentoEstimadoNecessario(BigDecimal.ZERO)
                     .compras(compras)
+                    .dividendYieldMensalAtual(dyMensal)
+                    .dividendYieldAnualizado(dyAnual)
+                    .custoParaUmRealRenda(custo1Real)
+                    .cotacaoEmTempoReal(cotacaoReal)
                     .build());
+        }
+
+        // Classificação e Ranking Automático: Qual ativo vale mais a pena comprar?
+        List<ProjecaoMetaDTO.ProjecaoFiiItemDTO> rankeaveis = itens.stream()
+                .filter(i -> i.getDividendYieldMensalAtual() != null && i.getDividendYieldMensalAtual().compareTo(BigDecimal.ZERO) > 0)
+                .sorted((a, b) -> b.getDividendYieldMensalAtual().compareTo(a.getDividendYieldMensalAtual()))
+                .toList();
+
+        int rank = 1;
+        for (ProjecaoMetaDTO.ProjecaoFiiItemDTO item : rankeaveis) {
+            item.setRankingOportunidade(rank);
+            if (rank == 1) {
+                item.setClassificacaoCompra("1º - MELHOR OPÇÃO");
+                item.setRecomendacaoCompra("Menor custo para gerar R$ 1,00/mês de renda (" + item.getDividendYieldMensalAtual() + "% a.m.)");
+            } else if (rank == 2) {
+                item.setClassificacaoCompra("2º - ÓTIMA COMPRA");
+                item.setRecomendacaoCompra("Excelente retorno sobre a cotação atual (" + item.getDividendYieldMensalAtual() + "% a.m.)");
+            } else if (rank == 3) {
+                item.setClassificacaoCompra("3º - BOA COMPRA");
+                item.setRecomendacaoCompra("Boa relação rendimento/preço de mercado (" + item.getDividendYieldMensalAtual() + "% a.m.)");
+            } else {
+                item.setClassificacaoCompra(rank + "º - MODERADO");
+                item.setRecomendacaoCompra("Retorno regular sobre o preço (" + item.getDividendYieldMensalAtual() + "% a.m.)");
+            }
+            rank++;
+        }
+
+        for (ProjecaoMetaDTO.ProjecaoFiiItemDTO i : itens) {
+            if (i.getRankingOportunidade() == null) {
+                i.setClassificacaoCompra("SEM PROVENTOS");
+                i.setRecomendacaoCompra("Aguardando histórico de dividendos para análise");
+            }
         }
 
         BigDecimal faltaParaMeta = metaMensal.subtract(rendaMensalAtualTotal);
@@ -127,10 +199,9 @@ public class MetaDividendoService {
             for (ProjecaoMetaDTO.ProjecaoFiiItemDTO item : itens) {
                 if (item.getDividendoMedioPorCota() != null && item.getDividendoMedioPorCota().compareTo(BigDecimal.ZERO) > 0) {
                     BigDecimal cotasFaltantes = faltaPorAtivo.divide(item.getDividendoMedioPorCota(), 2, RoundingMode.HALF_UP);
-                    Fii fii = fiiRepository.findById(item.getFiiId()).orElse(null);
-                    BigDecimal preco = (fii != null && fii.getPrecoMedio() != null && fii.getPrecoMedio().compareTo(BigDecimal.ZERO) > 0)
-                            ? fii.getPrecoMedio()
-                            : new BigDecimal("100.00");
+                    BigDecimal preco = (item.getPrecoAtual() != null && item.getPrecoAtual().compareTo(BigDecimal.ZERO) > 0)
+                            ? item.getPrecoAtual()
+                            : (item.getPrecoMedio() != null && item.getPrecoMedio().compareTo(BigDecimal.ZERO) > 0 ? item.getPrecoMedio() : new BigDecimal("100.00"));
                     BigDecimal investimentoEstimado = cotasFaltantes.multiply(preco);
 
                     item.setCotasFaltantesParaMetaTotal(cotasFaltantes);

@@ -4,7 +4,19 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Header';
 import api from '@/lib/axios';
-import { UploadCloud, CheckCircle2, AlertCircle, Lock, Tag, FileText, SlidersHorizontal, Edit3, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  UploadCloud,
+  CheckCircle2,
+  AlertCircle,
+  Lock,
+  Tag,
+  FileText,
+  SlidersHorizontal,
+  Edit3,
+  ChevronDown,
+  ChevronUp,
+  Sparkles
+} from 'lucide-react';
 
 export default function ImportarPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -61,7 +73,10 @@ export default function ImportarPage() {
     setErro('');
 
     try {
-      await api.post('/api/extrato/importar/confirmar', previewData.lancamentos);
+      await api.post('/api/extrato/importar/confirmar', {
+        lancamentos: previewData.lancamentos,
+        novosAtivos: previewData.ativosIdentificados,
+      });
       setSucesso(`Importação de ${previewData.lancamentos.length} lançamentos confirmada e salva com sucesso!`);
       setPreviewData(null);
       setFile(null);
@@ -124,7 +139,6 @@ export default function ImportarPage() {
                 <option value="COMPROVANTE_RENDA_FIXA">🏦 Comprovante de Aplicação em Renda Fixa (AUVP / BTG)</option>
                 <option value="NOTA_CORRETAGEM_RENDA_FIXA">🧾 Nota de Corretagem Renda Fixa (B3 / BTG)</option>
                 <option value="EXTRATO_INVESTIMENTO">📈 Extrato de Conta Investimento (AUVP / BTG Pactual)</option>
-
                 <option value="EXTRATO_CONTA_CORRENTE">💳 Extrato de Conta Corrente</option>
                 <option value="FATURA_CARTAO">📄 Fatura de Cartão de Crédito BTG</option>
                 <option value="NOTA_CORRETAGEM">📜 Nota de Corretagem B3 / BTG (Ações & FIIs)</option>
@@ -189,7 +203,7 @@ export default function ImportarPage() {
 
         {/* Preview dos Lançamentos com Permissão para Editar Antes de Salvar */}
         {previewData && (
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
@@ -208,6 +222,71 @@ export default function ImportarPage() {
                 Confirmar e Salvar no Banco
               </button>
             </div>
+
+            {/* SEÇÃO DE VALIDAÇÃO DE ATIVOS IDENTIFICADOS */}
+            {previewData.ativosIdentificados && previewData.ativosIdentificados.length > 0 && (
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-sky-600" />
+                    <h4 className="font-bold text-slate-800 text-sm">
+                      Validação de Ativos Encontrados no Extrato
+                    </h4>
+                  </div>
+                  <span className="text-xs font-medium">
+                    {previewData.ativosIdentificados.filter((a: any) => !a.cadastrado).length > 0 ? (
+                      <span className="text-sky-700 font-semibold bg-sky-100 px-2.5 py-1 rounded-md">
+                        ✨ {previewData.ativosIdentificados.filter((a: any) => !a.cadastrado).length} novo(s) ativo(s) serão cadastrados automaticamente
+                      </span>
+                    ) : (
+                      <span className="text-emerald-700 font-semibold bg-emerald-100 px-2.5 py-1 rounded-md flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Todos os ativos já estão cadastrados no sistema
+                      </span>
+                    )}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {previewData.ativosIdentificados.map((ativo: any, aIdx: number) => (
+                    <div
+                      key={aIdx}
+                      className={`p-3 rounded-xl border text-xs flex items-center justify-between gap-3 ${
+                        ativo.cadastrado
+                          ? 'bg-white border-slate-200'
+                          : 'bg-sky-50/80 border-sky-300 ring-1 ring-sky-200'
+                      }`}
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold font-mono text-sky-800 text-sm">
+                            {ativo.ticker}
+                          </span>
+                          <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-semibold">
+                            {ativo.classe || ativo.tipo}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 truncate mt-0.5 font-medium" title={ativo.nome}>
+                          {ativo.nome}
+                        </p>
+                      </div>
+
+                      <div className="shrink-0">
+                        {ativo.cadastrado ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[10px] font-bold">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            Cadastrado
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-sky-600 text-white rounded-lg text-[10px] font-bold shadow-xs">
+                            ✨ Será Cadastrado
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {previewData.alertas && previewData.alertas.length > 0 && (
               <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl space-y-1">

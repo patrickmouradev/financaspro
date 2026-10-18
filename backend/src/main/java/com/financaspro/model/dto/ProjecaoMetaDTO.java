@@ -37,6 +37,15 @@ public class ProjecaoMetaDTO {
         private BigDecimal cotasFaltantesParaMetaTotal;
         private BigDecimal investimentoEstimadoNecessario;
         private List<OperacaoCompraItemDTO> compras;
+
+        // Métricas de Mercado & Classificação Financeira Inteligente
+        private BigDecimal dividendYieldMensalAtual;  // % a.m. calculado sobre o preço real de mercado
+        private BigDecimal dividendYieldAnualizado;    // % a.a. anualizado
+        private BigDecimal custoParaUmRealRenda;       // R$ de aporte necessário para gerar R$ 1,00/mês
+        private Integer rankingOportunidade;           // 1 = melhor opção de compra da carteira
+        private String classificacaoCompra;            // "1º - MELHOR COMPRA", "2º - ÓTIMA OPÇÃO", etc.
+        private String recomendacaoCompra;             // Justificativa baseada no yield atual
+        private boolean cotacaoEmTempoReal;            // true se atualizada via B3 / Yahoo Finance
     }
 
     @Data

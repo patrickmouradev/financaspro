@@ -1,5 +1,8 @@
 package com.financaspro.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.financaspro.model.dto.AtivoDetectadoDTO;
 import com.financaspro.model.dto.ImportacaoResultadoDTO;
 import com.financaspro.model.dto.LancamentoDTO;
 import com.financaspro.service.ImportacaoService;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,9 +23,11 @@ import java.util.List;
 public class ImportacaoController {
 
     private final ImportacaoService importacaoService;
+    private final ObjectMapper objectMapper;
 
-    public ImportacaoController(ImportacaoService importacaoService) {
+    public ImportacaoController(ImportacaoService importacaoService, ObjectMapper objectMapper) {
         this.importacaoService = importacaoService;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping
@@ -39,8 +45,26 @@ public class ImportacaoController {
     }
 
     @PostMapping("/confirmar")
-    public ResponseEntity<List<LancamentoDTO>> confirmarImportacao(@RequestBody List<LancamentoDTO> dtosConfirmados) {
-        List<LancamentoDTO> salvos = importacaoService.confirmarImportacao(dtosConfirmados);
+    public ResponseEntity<List<LancamentoDTO>> confirmarImportacao(@RequestBody JsonNode body) throws Exception {
+        List<LancamentoDTO> lancamentos = new ArrayList<>();
+        List<AtivoDetectadoDTO> novosAtivos = new ArrayList<>();
+
+        if (body.isArray()) {
+            lancamentos = objectMapper.readerForListOf(LancamentoDTO.class).readValue(body);
+        } else if (body.isObject()) {
+            if (body.has("lancamentos") && body.get("lancamentos").isArray()) {
+                lancamentos = objectMapper.readerForListOf(LancamentoDTO.class).readValue(body.get("lancamentos"));
+            }
+            if (body.has("novosAtivos") && body.get("novosAtivos").isArray()) {
+                novosAtivos = objectMapper.readerForListOf(AtivoDetectadoDTO.class).readValue(body.get("novosAtivos"));
+            }
+        }
+
+        if (!novosAtivos.isEmpty()) {
+            importacaoService.cadastrarNovosAtivosSeNaoExistirem(novosAtivos);
+        }
+
+        List<LancamentoDTO> salvos = importacaoService.confirmarImportacao(lancamentos);
         return ResponseEntity.ok(salvos);
     }
 
@@ -50,4 +74,3 @@ public class ImportacaoController {
         return ResponseEntity.ok("Todos os lançamentos, operações, proventos e ativos foram zerados com sucesso.");
     }
 }
-

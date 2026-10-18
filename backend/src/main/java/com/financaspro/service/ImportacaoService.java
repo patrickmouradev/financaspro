@@ -2,6 +2,7 @@ package com.financaspro.service;
 
 import com.financaspro.builder.LancamentoBuilder;
 import com.financaspro.model.dto.ImportacaoResultadoDTO;
+import com.financaspro.model.dto.AtivoDetectadoDTO;
 import com.financaspro.model.dto.LancamentoDTO;
 import com.financaspro.model.entity.Ativo;
 import com.financaspro.model.entity.Categoria;
@@ -139,7 +140,7 @@ public class ImportacaoService {
                     lancamentosBrutos.add(l);
                     mapaRendaFixa.put(l, rf);
                 }
-            } else if ("EXTRATO_INVESTIMENTO".equalsIgnoreCase(tipoUpper)) {
+            } else if ("EXTRATO_INVESTIMENTO".equalsIgnoreCase(tipoUpper) || nomeUpper.contains("INVEST") || nomeUpper.contains("AUVP") || btgExtratoInvestimentoParser.ehFormatoBtgInvestimento(bytes, nomeArquivo, senhaFinal)) {
                 List<ItemExtratoInvestimento> itensInv = btgExtratoInvestimentoParser.parsearExtratoInvestimento(bytes, senhaFinal);
                 if (!itensInv.isEmpty()) {
                     dividendoReconciliacaoService.reconciliarEProcessarProventos(itensInv);
@@ -248,6 +249,28 @@ public class ImportacaoService {
 
                 if (lancamentosBrutos.isEmpty()) {
                     try {
+                        if (btgExtratoInvestimentoParser.ehFormatoBtgInvestimento(bytes, nomeArquivo, senhaFinal)) {
+                            List<ItemExtratoInvestimento> itensInv = btgExtratoInvestimentoParser.parsearExtratoInvestimento(bytes, senhaFinal);
+                            if (!itensInv.isEmpty()) {
+                                dividendoReconciliacaoService.reconciliarEProcessarProventos(itensInv);
+                                for (ItemExtratoInvestimento item : itensInv) {
+                                    lancamentosBrutos.add(Lancamento.builder()
+                                            .dataLancamento(item.getDataMovimento())
+                                            .descricao(item.getDescricao())
+                                            .valor(item.getValor())
+                                            .tipo(item.getTipo())
+                                            .origem(item.getOrigem())
+                                            .observacao(item.getObservacao())
+                                            .statusCategorizacao("PENDENTE")
+                                            .build());
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                }
+
+                if (lancamentosBrutos.isEmpty()) {
+                    try {
                         List<ItemExtratoInvestimento> itensInv = btgExtratoInvestimentoParser.parsearExtratoInvestimento(bytes, senhaFinal);
                         if (!itensInv.isEmpty()) {
                             dividendoReconciliacaoService.reconciliarEProcessarProventos(itensInv);
@@ -344,12 +367,15 @@ public class ImportacaoService {
             alertas.add(ignoradosDeduplicacao + " lançamentos já existentes foram ignorados por deduplicação.");
         }
 
+                List<AtivoDetectadoDTO> ativosIdentificados = extrairEValidarAtivos(bytes, senhaFinal, lancamentosBrutos, mapaRendaFixa);
+
         return ImportacaoResultadoDTO.builder()
                 .totalLidos(totalLidos)
                 .categorizadosAutomaticos(autoCat)
                 .pendentesCategorizacao(pendentes)
                 .ignoradosDeduplicacao(ignoradosDeduplicacao)
                 .lancamentos(dtosPreview)
+                .ativosIdentificados(ativosIdentificados)
                 .alertas(alertas)
                 .build();
     }
@@ -547,18 +573,149 @@ public class ImportacaoService {
                     .build());
         });
 
-        TipoOperacao tipoOpEnum = "VENDA_ATIVO".equalsIgnoreCase(l.getTipo()) ? TipoOperacao.VENDA : TipoOperacao.COMPRA;
+        boolean ehTrade = "COMPRA_ATIVO".equalsIgnoreCase(l.getTipo()) || "VENDA_ATIVO".equalsIgnoreCase(l.getTipo()) || desc.contains("COMPRA") || desc.contains("VENDA") || desc.contains("LIQ BOLSA");
+        if (ehTrade) {
+            TipoOperacao tipoOpEnum = ("VENDA_ATIVO".equalsIgnoreCase(l.getTipo()) || desc.contains("VENDA")) ? TipoOperacao.VENDA : TipoOperacao.COMPRA;
+            Operacao op = Operacao.builder()
+                    .ativo(ativo)
+                    .tipo(tipoOpEnum)
+                    .dataOperacao(l.getDataLancamento().toLocalDate())
+                    .quantidade(qtd)
+                    .precoUnitario(precoMedioAjustado)
+                    .taxas(BigDecimal.ZERO)
+                    .observacao("Importado via Nota de Corretagem / Extrato")
+                    .build();
+            operacaoRepository.save(op);
+        }
+    }
 
-        Operacao op = Operacao.builder()
-                .ativo(ativo)
-                .tipo(tipoOpEnum)
-                .dataOperacao(l.getDataLancamento().toLocalDate())
-                .quantidade(qtd)
-                .precoUnitario(precoMedioAjustado)
-                .taxas(BigDecimal.ZERO)
-                .observacao("Importado via Nota de Corretagem / Extrato")
-                .build();
-        operacaoRepository.save(op);
+
+    @Transactional
+    public void cadastrarNovosAtivosSeNaoExistirem(List<AtivoDetectadoDTO> ativos) {
+        if (ativos == null || ativos.isEmpty()) return;
+        for (AtivoDetectadoDTO dto : ativos) {
+            if (dto.getTicker() == null || dto.getTicker().trim().isEmpty()) continue;
+            String ticker = dto.getTicker().toUpperCase().trim();
+
+            TipoAtivo tipoAtivo = TipoAtivo.ACAO;
+            if ("FII".equalsIgnoreCase(dto.getTipo())) {
+                tipoAtivo = TipoAtivo.FII;
+            } else if ("RENDA_FIXA".equalsIgnoreCase(dto.getTipo())) {
+                tipoAtivo = TipoAtivo.RENDA_FIXA;
+            }
+
+            final TipoAtivo fTipo = tipoAtivo;
+            final String fNome = (dto.getNome() != null && !dto.getNome().trim().isEmpty()) ? dto.getNome().trim() : ticker;
+            final String fClasse = dto.getClasse();
+            final String fIndexador = dto.getIndexador();
+
+            ativoRepository.findByTicker(ticker).orElseGet(() -> {
+                return ativoRepository.save(Ativo.builder()
+                        .ticker(ticker)
+                        .nome(fNome)
+                        .tipo(fTipo)
+                        .categoriaNome(fTipo == TipoAtivo.FII ? "Fundos Imobiliários" : (fTipo == TipoAtivo.RENDA_FIXA ? "Renda Fixa" : "Ações"))
+                        .classe(fClasse != null ? fClasse : (fTipo == TipoAtivo.FII ? "Tijolo" : (fTipo == TipoAtivo.RENDA_FIXA ? "CDB" : "Blue Chips")))
+                        .indexador(fIndexador != null ? fIndexador : (fTipo == TipoAtivo.FII ? "IPCA" : (fTipo == TipoAtivo.RENDA_FIXA ? "CDI" : "Ibovespa")))
+                        .build());
+            });
+
+            if (fTipo == TipoAtivo.FII) {
+                fiiRepository.findByTicker(ticker).orElseGet(() -> {
+                    return fiiRepository.save(Fii.builder()
+                            .ticker(ticker)
+                            .nome(fNome)
+                            .segmento("Imobiliário")
+                            .quantidadeCotas(BigDecimal.ZERO)
+                            .precoMedio(BigDecimal.ZERO)
+                            .build());
+                });
+            }
+        }
+    }
+
+    public List<AtivoDetectadoDTO> extrairEValidarAtivos(byte[] bytes, String senhaFinal, List<Lancamento> lancamentosBrutos, Map<Lancamento, RendaFixaNotaDTO> mapaRendaFixa) {
+        Map<String, AtivoDetectadoDTO> mapAtivos = new java.util.LinkedHashMap<>();
+
+        // 1. Extração estruturada do Extrato de Investimento BTG / AUVP
+        try {
+            List<AtivoDetectadoDTO> extraidos = btgExtratoInvestimentoParser.extrairAtivosDoExtrato(bytes, senhaFinal);
+            if (extraidos != null) {
+                for (AtivoDetectadoDTO a : extraidos) {
+                    if (a.getTicker() != null && !a.getTicker().trim().isEmpty()) {
+                        mapAtivos.put(a.getTicker().toUpperCase().trim(), a);
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // 2. Extração dos lançamentos brutos (Notas de corretagem / Renda Fixa / Trades)
+        if (lancamentosBrutos != null) {
+            for (Lancamento l : lancamentosBrutos) {
+                RendaFixaNotaDTO rf = (mapaRendaFixa != null) ? mapaRendaFixa.get(l) : null;
+                if (rf != null) {
+                    String tickerRf = gerarTickerRendaFixa(rf);
+                    if (!mapAtivos.containsKey(tickerRf)) {
+                        mapAtivos.put(tickerRf, AtivoDetectadoDTO.builder()
+                                .ticker(tickerRf)
+                                .nome((rf.getProduto() != null ? rf.getProduto() : "Renda Fixa") + " - " + (rf.getEmissor() != null ? rf.getEmissor() : "BTG Pactual"))
+                                .tipo("RENDA_FIXA")
+                                .classe(rf.getProduto() != null ? rf.getProduto() : "CDB")
+                                .indexador(rf.getIndice() != null ? rf.getIndice() : "CDI")
+                                .build());
+                    }
+                } else if (l.getDescricao() != null) {
+                    String desc = l.getDescricao().toUpperCase();
+                    Matcher mTicker = Pattern.compile("\\b([A-Z]{4}[0-9]{1,2}[B]?)\\b").matcher(desc);
+                    while (mTicker.find()) {
+                        String t = mTicker.group(1).toUpperCase().trim();
+                        if (!mapAtivos.containsKey(t) && !t.equalsIgnoreCase("DATA") && !t.equalsIgnoreCase("VALO") && !t.equalsIgnoreCase("SALD") && !t.equalsIgnoreCase("TOTAL") && !t.equalsIgnoreCase("EXTR")) {
+                            boolean ehFii = t.endsWith("11") && !t.startsWith("AURO") && !t.startsWith("BOVA") && !t.startsWith("IVVB") && !t.startsWith("SMAL");
+                            boolean ehEtf = t.startsWith("AURO") || t.startsWith("BOVA") || t.startsWith("IVVB") || t.startsWith("SMAL");
+                            String tipoStr = ehFii ? "FII" : "ACAO";
+                            String classeStr = ehFii ? "Fundos Imobiliários" : (ehEtf ? "ETF" : "Ações");
+                            String nomeStr = ehFii ? ("FII " + t) : (ehEtf ? ("ETF " + t) : ("Ação " + t));
+
+                            mapAtivos.put(t, AtivoDetectadoDTO.builder()
+                                    .ticker(t)
+                                    .nome(nomeStr)
+                                    .tipo(tipoStr)
+                                    .classe(classeStr)
+                                    .indexador(ehFii ? "IPCA" : "Ibovespa")
+                                    .build());
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. Validação no banco de dados se cada ativo já está cadastrado
+        List<AtivoDetectadoDTO> resultado = new ArrayList<>();
+        for (AtivoDetectadoDTO a : mapAtivos.values()) {
+            boolean existeEmAtivo = ativoRepository.findByTicker(a.getTicker()).isPresent();
+            boolean existeEmFii = a.getTipo().equalsIgnoreCase("FII") && fiiRepository.findByTicker(a.getTicker()).isPresent();
+            boolean cadastrado = existeEmAtivo || existeEmFii;
+
+            a.setCadastrado(cadastrado);
+            a.setStatus(cadastrado ? "CADASTRADO" : "NOVO - SERÁ CADASTRADO");
+            resultado.add(a);
+        }
+
+        return resultado;
+    }
+
+    private String gerarTickerRendaFixa(RendaFixaNotaDTO rf) {
+        String produto = (rf != null && rf.getProduto() != null && !rf.getProduto().trim().isEmpty()) ? rf.getProduto().trim() : "CDB";
+        String emissor = (rf != null && rf.getEmissor() != null && !rf.getEmissor().trim().isEmpty()) ? rf.getEmissor().trim() : "BTG";
+        java.time.LocalDate dataVencimento = (rf != null) ? rf.getDataVencimento() : null;
+
+        String slugProd = produto.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+        if (slugProd.length() > 6) slugProd = slugProd.substring(0, 6);
+        String slugEmissor = emissor.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+        if (slugEmissor.length() > 4) slugEmissor = slugEmissor.substring(0, 4);
+
+        String sufixoVenc = (dataVencimento != null) ? dataVencimento.format(DateTimeFormatter.ofPattern("ddMMyy")) : "S_VENC";
+        return slugProd + "_" + slugEmissor + "_" + sufixoVenc;
     }
 
     @Transactional

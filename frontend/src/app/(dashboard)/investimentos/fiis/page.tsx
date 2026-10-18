@@ -1,10 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Header';
 import api from '@/lib/axios';
-import { Building2, Target, TrendingUp, ChevronDown, ChevronRight, Calendar, DollarSign, FileText } from 'lucide-react';
+import {
+  Building2,
+  Target,
+  TrendingUp,
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  Sparkles,
+  Award,
+  Zap,
+  HelpCircle,
+  CheckCircle2,
+  ArrowUpDown,
+  Radio
+} from 'lucide-react';
 
 interface CompraItem {
   id: number;
@@ -31,13 +45,21 @@ interface ProjecaoFiiItem {
   cotasFaltantesParaMetaTotal: number;
   investimentoEstimadoNecessario: number;
   compras?: CompraItem[];
+  dividendYieldMensalAtual?: number;
+  dividendYieldAnualizado?: number;
+  custoParaUmRealRenda?: number;
+  rankingOportunidade?: number;
+  classificacaoCompra?: string;
+  recomendacaoCompra?: string;
+  cotacaoEmTempoReal?: boolean;
 }
 
 export default function FiisPage() {
   const [metaMensalInput, setMetaMensalInput] = useState('1000');
   const [expandedTicker, setExpandedTicker] = useState<string | null>(null);
+  const [ordenarPorMelhorCompra, setOrdenarPorMelhorCompra] = useState(true);
 
-  const { data: projecao, isLoading } = useQuery({
+  const { data: projecao, isLoading, refetch } = useQuery({
     queryKey: ['projecaoMeta', metaMensalInput],
     queryFn: async () => {
       const resp = await api.get(`/api/fiis/meta/projecao?metaMensal=${metaMensalInput}`);
@@ -50,6 +72,19 @@ export default function FiisPage() {
   const toggleAccordion = (ticker: string) => {
     setExpandedTicker((prev) => (prev === ticker ? null : ticker));
   };
+
+  const listaOrdenada = useMemo(() => {
+    if (!projecao?.projecoesPorFii) return [];
+    const lista = [...projecao.projecoesPorFii];
+    if (ordenarPorMelhorCompra) {
+      lista.sort((a: ProjecaoFiiItem, b: ProjecaoFiiItem) => {
+        const rankA = a.rankingOportunidade ?? 999;
+        const rankB = b.rankingOportunidade ?? 999;
+        return rankA - rankB;
+      });
+    }
+    return lista;
+  }, [projecao?.projecoesPorFii, ordenarPorMelhorCompra]);
 
   return (
     <>
@@ -114,168 +149,286 @@ export default function FiisPage() {
           </div>
         </div>
 
-        {/* Tabela de Projeções Renda Variável por Ativo */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-sky-600" />
-              <h3 className="font-bold text-slate-800 text-base">Carteira de Renda Variável (FIIs & Ações) — Compras & Preço Médio</h3>
+        {/* Card Explicativo do Especialista de Mercado */}
+        <div className="p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-sky-50 border border-emerald-200 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 bg-emerald-600 text-white rounded-xl shadow-xs shrink-0 mt-0.5">
+              <Award className="w-5 h-5" />
             </div>
-            <span className="text-xs text-slate-500">Clique na linha do ativo para expandir o histórico de compras</span>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                Classificação Inteligente de Compra — Regra do Especialista
+                <span className="px-2 py-0.5 bg-emerald-600 text-white rounded-md text-[10px] font-extrabold uppercase">
+                  Preço Real B3
+                </span>
+              </h4>
+              <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                Calculamos o <strong>Dividend Yield sobre a cotação real de mercado</strong> e o <strong>custo em reais para gerar R$ 1,00 de renda mensal</strong>. 
+                O ativo no topo do ranking entrega a maior taxa de retorno no preço atual, sendo a melhor oportunidade de aporte.
+              </p>
+            </div>
           </div>
 
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
-              <tr>
-                <th className="w-8 px-3 py-3"></th>
-                <th className="px-4 py-3">Ticker</th>
-                <th className="px-4 py-3">Nome</th>
-                <th className="px-4 py-3 text-right">Qtd Cotas</th>
-                <th className="px-4 py-3 text-right">Preço Médio</th>
-                <th className="px-4 py-3 text-right">Preço Atual</th>
-                <th className="px-4 py-3 text-right">Total Investido</th>
-                <th className="px-4 py-3 text-right">Rend./Cota</th>
-                <th className="px-4 py-3 text-right">Renda Mensal</th>
-                <th className="px-4 py-3 text-right">Cotas Faltantes</th>
-                <th className="px-4 py-3 text-right">Aporte Estimado</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={11} className="px-6 py-8 text-center text-slate-400">
-                    Carregando carteira de Renda Variável...
-                  </td>
-                </tr>
-              ) : projecao?.projecoesPorFii?.length === 0 || !projecao ? (
-                <tr>
-                  <td colSpan={11} className="px-6 py-8 text-center text-slate-400">
-                    Nenhum ativo de Renda Variável cadastrado para cálculo de projeção. Importe Notas de Corretagem B3.
-                  </td>
-                </tr>
-              ) : (
-                projecao.projecoesPorFii.map((item: ProjecaoFiiItem) => {
-                  const isExpanded = expandedTicker === item.ticker;
-                  const temCompras = item.compras && item.compras.length > 0;
+          <button
+            onClick={() => setOrdenarPorMelhorCompra(!ordenarPorMelhorCompra)}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${
+              ordenarPorMelhorCompra
+                ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30'
+                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            <ArrowUpDown className="w-3.5 h-3.5" />
+            {ordenarPorMelhorCompra ? 'Ordenado: Mais Atrativo 1º' : 'Ordem Padrão'}
+          </button>
+        </div>
 
-                  return (
-                    <>
-                      <tr
-                        key={item.ticker}
-                        onClick={() => toggleAccordion(item.ticker)}
-                        className={`cursor-pointer transition-colors ${
-                          isExpanded ? 'bg-sky-50/50 hover:bg-sky-50' : 'hover:bg-slate-50/70'
-                        }`}
-                      >
-                        <td className="px-3 py-4 text-slate-400">
-                          {isExpanded ? (
-                            <ChevronDown className="w-4 h-4 text-sky-600" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4 text-slate-400" />
-                          )}
-                        </td>
-                        <td className="px-4 py-4 font-bold text-sky-700 font-mono flex items-center gap-1.5">
-                          {item.ticker}
-                        </td>
-                        <td className="px-4 py-4 font-medium text-slate-800">{item.nome}</td>
-                        <td className="px-4 py-4 text-right font-mono font-semibold text-slate-900">{item.cotasAtuais}</td>
-                        <td className="px-4 py-4 text-right font-mono text-slate-700 font-semibold">
-                          R$ {(item.precoMedio || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono text-slate-600">
-                          R$ {(item.precoAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono font-bold text-slate-900">
-                          R$ {(item.valorTotalInvestido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono text-slate-600">
-                          R$ {(item.dividendoMedioPorCota || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono font-bold text-emerald-600">
-                          R$ {(item.rendimentoMensalAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono text-amber-600 font-semibold">{item.cotasFaltantesParaMetaTotal}</td>
-                        <td className="px-4 py-4 text-right font-mono font-bold text-slate-900">
-                          R$ {(item.investimentoEstimadoNecessario || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </td>
-                      </tr>
+        {/* Tabela de Projeções Renda Variável por Ativo */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-sky-600" />
+              <h3 className="font-bold text-slate-800 text-base">Carteira de Renda Variável (FIIs & Ações) — Cotações B3 & Análise de Compra</h3>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-slate-500">
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Cotações Atualizadas B3
+              </span>
+              <span>•</span>
+              <span>Clique na linha para ver histórico de compras</span>
+            </div>
+          </div>
 
-                      {/* Accordion - Detalhamento de Compras do Ticker */}
-                      {isExpanded && (
-                        <tr key={`${item.ticker}-expanded`} className="bg-slate-50/80">
-                          <td colSpan={11} className="px-6 py-4 border-t border-b border-sky-100">
-                            <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3">
-                              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                                <h4 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                  <FileText className="w-4 h-4 text-sky-600" />
-                                  Histórico Detalhado de Compras e Operações — {item.ticker}
-                                </h4>
-                                <span className="text-xs font-semibold text-slate-500">
-                                  Preço Médio Ponderado: R$ {(item.precoMedio || 0).toFixed(2)}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+                <tr>
+                  <th className="w-8 px-3 py-3"></th>
+                  <th className="px-3 py-3">Ticker</th>
+                  <th className="px-3 py-3">Nome</th>
+                  <th className="px-3 py-3 text-right">Qtd</th>
+                  <th className="px-3 py-3 text-right">Preço Médio</th>
+                  <th className="px-3 py-3 text-right">Preço Atual</th>
+                  <th className="px-3 py-3 text-right">Rend./Cota</th>
+                  {/* NOVA COLUNA SOLICITADA */}
+                  <th className="px-4 py-3 text-center bg-emerald-50/70 border-x border-emerald-100 text-emerald-900 font-bold">
+                    Classificação / Vale a Pena?
+                  </th>
+                  <th className="px-3 py-3 text-right">Total Investido</th>
+                  <th className="px-3 py-3 text-right">Renda Mensal</th>
+                  <th className="px-3 py-3 text-right">Aporte Estimado</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={11} className="px-6 py-8 text-center text-slate-400">
+                      Carregando carteira de Renda Variável e cotações de mercado...
+                    </td>
+                  </tr>
+                ) : listaOrdenada.length === 0 ? (
+                  <tr>
+                    <td colSpan={11} className="px-6 py-8 text-center text-slate-400">
+                      Nenhum ativo de Renda Variável cadastrado para cálculo de projeção. Importe Notas de Corretagem ou Extratos.
+                    </td>
+                  </tr>
+                ) : (
+                  listaOrdenada.map((item: ProjecaoFiiItem) => {
+                    const isExpanded = expandedTicker === item.ticker;
+                    const temCompras = item.compras && item.compras.length > 0;
+                    const rank = item.rankingOportunidade;
+
+                    return (
+                      <tbody key={item.ticker} className="divide-y divide-slate-100">
+                        <tr
+                          onClick={() => toggleAccordion(item.ticker)}
+                          className={`cursor-pointer transition-colors ${
+                            isExpanded ? 'bg-sky-50/50 hover:bg-sky-50' : 'hover:bg-slate-50/70'
+                          }`}
+                        >
+                          <td className="px-3 py-4 text-slate-400">
+                            {isExpanded ? (
+                              <ChevronDown className="w-4 h-4 text-sky-600" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-slate-400" />
+                            )}
+                          </td>
+                          <td className="px-3 py-4 font-bold text-sky-700 font-mono">
+                            {item.ticker}
+                          </td>
+                          <td className="px-3 py-4 font-medium text-slate-800 text-xs max-w-[180px] truncate" title={item.nome}>
+                            {item.nome}
+                          </td>
+                          <td className="px-3 py-4 text-right font-mono font-semibold text-slate-900">
+                            {item.cotasAtuais}
+                          </td>
+                          <td className="px-3 py-4 text-right font-mono text-slate-600">
+                            R$ {(item.precoMedio || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                          <td className="px-3 py-4 text-right font-mono">
+                            <div className="font-bold text-slate-900">
+                              R$ {(item.precoAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
+                            {item.cotacaoEmTempoReal && (
+                              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-sans font-semibold">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Ao Vivo B3
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-3 py-4 text-right font-mono text-slate-600">
+                            R$ {(item.dividendoMedioPorCota || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+
+                          {/* NOVA COLUNA: CLASSIFICAÇÃO FINANCEIRA DE COMPRA */}
+                          <td className="px-4 py-3 text-center bg-emerald-50/40 border-x border-emerald-100">
+                            {rank === 1 && (
+                              <div className="inline-flex flex-col items-center">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs font-black shadow-xs">
+                                  🥇 1º - MELHOR OPÇÃO
+                                </span>
+                                <span className="text-[11px] font-bold text-emerald-700 mt-1">
+                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m. ({item.dividendYieldAnualizado?.toFixed(1)}% a.a.)
+                                </span>
+                                <span className="text-[10px] text-slate-500 font-mono">
+                                  R$ {item.custoParaUmRealRenda?.toFixed(2)} p/ R$ 1 renda
                                 </span>
                               </div>
+                            )}
 
-                              {temCompras ? (
-                                <div className="overflow-x-auto">
-                                  <table className="w-full text-xs">
-                                    <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
-                                      <tr>
-                                        <th className="px-3 py-2 text-left">Data da Compra</th>
-                                        <th className="px-3 py-2 text-right">Qtd Cotas</th>
-                                        <th className="px-3 py-2 text-right">Preço Unitário</th>
-                                        <th className="px-3 py-2 text-right">Taxas B3</th>
-                                        <th className="px-3 py-2 text-right">Preço Médio Ajustado</th>
-                                        <th className="px-3 py-2 text-right">Total Pago</th>
-                                        <th className="px-3 py-2 text-left">Origem / Nota</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100 font-mono">
-                                      {item.compras!.map((compra: CompraItem, idx: number) => (
-                                        <tr key={compra.id || idx} className="hover:bg-slate-50">
-                                          <td className="px-3 py-2 text-slate-700 font-sans">
-                                            {compra.dataCompra
-                                              ? new Date(compra.dataCompra + 'T00:00:00').toLocaleDateString('pt-BR')
-                                              : '-'}
-                                          </td>
-                                          <td className="px-3 py-2 text-right font-bold text-slate-900">{compra.quantidade}</td>
-                                          <td className="px-3 py-2 text-right text-slate-600">
-                                            R$ {(compra.precoUnitario || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                          </td>
-                                          <td className="px-3 py-2 text-right text-slate-500">
-                                            R$ {(compra.taxasB3 || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                          </td>
-                                          <td className="px-3 py-2 text-right font-semibold text-sky-700">
-                                            R$ {(compra.precoMedioAjustadoOperacao || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                          </td>
-                                          <td className="px-3 py-2 text-right font-bold text-slate-900">
-                                            R$ {(compra.valorTotalPago || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                          </td>
-                                          <td className="px-3 py-2 text-slate-500 font-sans text-xs">
-                                            {compra.origemOuNota || 'Nota de Corretagem'}
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              ) : (
-                                <p className="text-xs text-slate-400 py-2">
-                                  Nenhum registro individual de compra localizado para este ativo.
-                                </p>
-                              )}
-                            </div>
+                            {rank === 2 && (
+                              <div className="inline-flex flex-col items-center">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-800 border border-slate-300 rounded-lg text-xs font-bold">
+                                  🥈 2º - ÓTIMA COMPRA
+                                </span>
+                                <span className="text-[11px] font-bold text-emerald-700 mt-1">
+                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m.
+                                </span>
+                                <span className="text-[10px] text-slate-500 font-mono">
+                                  R$ {item.custoParaUmRealRenda?.toFixed(2)} p/ R$ 1 renda
+                                </span>
+                              </div>
+                            )}
+
+                            {rank === 3 && (
+                              <div className="inline-flex flex-col items-center">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold">
+                                  🥉 3º - BOA COMPRA
+                                </span>
+                                <span className="text-[11px] font-bold text-emerald-700 mt-1">
+                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m.
+                                </span>
+                                <span className="text-[10px] text-slate-500 font-mono">
+                                  R$ {item.custoParaUmRealRenda?.toFixed(2)} p/ R$ 1 renda
+                                </span>
+                              </div>
+                            )}
+
+                            {rank && rank > 3 && (
+                              <div className="inline-flex flex-col items-center">
+                                <span className="inline-flex items-center px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs font-medium">
+                                  {rank}º - MODERADO
+                                </span>
+                                <span className="text-[11px] font-semibold text-slate-600 mt-0.5">
+                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m.
+                                </span>
+                              </div>
+                            )}
+
+                            {!rank && (
+                              <span className="text-xs text-slate-400">
+                                Sem Histórico
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="px-3 py-4 text-right font-mono font-bold text-slate-900">
+                            R$ {(item.valorTotalInvestido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                          <td className="px-3 py-4 text-right font-mono font-bold text-emerald-600">
+                            R$ {(item.rendimentoMensalAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                          <td className="px-3 py-4 text-right font-mono font-bold text-slate-900">
+                            R$ {(item.investimentoEstimadoNecessario || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
                         </tr>
-                      )}
-                    </>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+
+                        {/* Accordion - Detalhamento de Compras do Ticker */}
+                        {isExpanded && (
+                          <tr className="bg-slate-50/80">
+                            <td colSpan={11} className="px-6 py-4 border-t border-b border-sky-100">
+                              <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3">
+                                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                                  <h4 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                    <FileText className="w-4 h-4 text-sky-600" />
+                                    Histórico Detalhado de Compras e Operações — {item.ticker}
+                                  </h4>
+                                  <span className="text-xs font-semibold text-slate-500">
+                                    Preço Médio Ponderado: R$ {(item.precoMedio || 0).toFixed(2)} | Cotação Mercado: R$ {(item.precoAtual || 0).toFixed(2)}
+                                  </span>
+                                </div>
+
+                                {temCompras ? (
+                                  <div className="overflow-x-auto">
+                                    <table className="w-full text-xs">
+                                      <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                        <tr>
+                                          <th className="px-3 py-2 text-left">Data da Compra</th>
+                                          <th className="px-3 py-2 text-right">Qtd Cotas</th>
+                                          <th className="px-3 py-2 text-right">Preço Unitário</th>
+                                          <th className="px-3 py-2 text-right">Taxas B3</th>
+                                          <th className="px-3 py-2 text-right">Preço Médio Ajustado</th>
+                                          <th className="px-3 py-2 text-right">Total Pago</th>
+                                          <th className="px-3 py-2 text-left">Origem / Nota</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody className="divide-y divide-slate-100 font-mono">
+                                        {item.compras!.map((compra: CompraItem, idx: number) => (
+                                          <tr key={compra.id || idx} className="hover:bg-slate-50">
+                                            <td className="px-3 py-2 text-slate-700 font-sans">
+                                              {compra.dataCompra
+                                                ? new Date(compra.dataCompra + 'T00:00:00').toLocaleDateString('pt-BR')
+                                                : '-'}
+                                            </td>
+                                            <td className="px-3 py-2 text-right font-bold text-slate-900">{compra.quantidade}</td>
+                                            <td className="px-3 py-2 text-right text-slate-600">
+                                              R$ {(compra.precoUnitario || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </td>
+                                            <td className="px-3 py-2 text-right text-slate-500">
+                                              R$ {(compra.taxasB3 || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </td>
+                                            <td className="px-3 py-2 text-right font-semibold text-sky-700">
+                                              R$ {(compra.precoMedioAjustadoOperacao || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </td>
+                                            <td className="px-3 py-2 text-right font-bold text-slate-900">
+                                              R$ {(compra.valorTotalPago || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </td>
+                                            <td className="px-3 py-2 text-slate-500 font-sans text-xs">
+                                              {compra.origemOuNota || 'Nota de Corretagem'}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-slate-400 py-2">
+                                    Nenhum registro individual de compra localizado para este ativo.
+                                  </p>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
     </>
   );
 }
-

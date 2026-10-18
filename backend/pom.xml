@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.financaspro</groupId>
 	<artifactId>financaspro-backend</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>financaspro-backend</name>
 	<description>Backend do FinançasPro - Controle Financeiro Pessoal</description>
 

@@ -71,6 +71,9 @@ public final class CsvExcelParser {
             for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
                 String text = PdfTextExtractor.getTextFromPage(pdfDoc.getPage(i));
                 if (text != null) {
+                    text = text.replace('\u0000', ' ');
+                }
+                if (text != null) {
                     String[] splitLinhas = text.split("\r?\n");
                     for (String l : splitLinhas) {
                         if (!l.trim().isEmpty()) {

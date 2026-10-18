@@ -45,6 +45,8 @@ export default function ExtratoPage() {
     const ehInvestimento = (
       origem.includes('CORRETAGEM') ||
       origem.includes('EXTRATO_INVESTIMENTO') ||
+      origem.includes('BTG_INVESTIMENTO') ||
+      origem.includes('INVESTIMENTO') ||
       tipo === 'COMPRA_ATIVO' ||
       tipo === 'VENDA_ATIVO' ||
       tipo === 'DIVIDENDO' ||

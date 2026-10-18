@@ -23,5 +23,8 @@ public class ImportacaoResultadoDTO {
     private List<LancamentoDTO> lancamentos = new ArrayList<>();
 
     @Builder.Default
+    private List<AtivoDetectadoDTO> ativosIdentificados = new ArrayList<>();
+
+    @Builder.Default
     private List<String> alertas = new ArrayList<>();
 }
