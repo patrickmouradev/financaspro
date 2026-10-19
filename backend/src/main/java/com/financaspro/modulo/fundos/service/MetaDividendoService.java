@@ -189,18 +189,13 @@ public class MetaDividendoService {
         }
 
         BigDecimal percentualConcluido = PercentualUtils.calcularPercentual(rendaMensalAtualTotal, metaMensal);
-        BigDecimal aporteTotalEstimado = BigDecimal.ZERO;
+        BigDecimal menorAporteNecessario = null;
 
-        long qtdAtivosValidos = itens.stream()
-                .filter(i -> i.getDividendoMedioPorCota() != null && i.getDividendoMedioPorCota().compareTo(BigDecimal.ZERO) > 0)
-                .count();
-
-        if (faltaParaMeta.compareTo(BigDecimal.ZERO) > 0 && qtdAtivosValidos > 0) {
-            BigDecimal faltaPorAtivo = faltaParaMeta.divide(new BigDecimal(qtdAtivosValidos), 4, RoundingMode.HALF_UP);
-
+        if (faltaParaMeta.compareTo(BigDecimal.ZERO) > 0) {
             for (ProjecaoMetaDTO.ProjecaoFiiItemDTO item : itens) {
                 if (item.getDividendoMedioPorCota() != null && item.getDividendoMedioPorCota().compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal cotasFaltantes = faltaPorAtivo.divide(item.getDividendoMedioPorCota(), 2, RoundingMode.HALF_UP);
+                    // Cotas inteiras necessárias neste ativo para cobrir 100% da meta restante
+                    BigDecimal cotasFaltantes = faltaParaMeta.divide(item.getDividendoMedioPorCota(), 0, RoundingMode.CEILING);
                     BigDecimal preco = (item.getPrecoAtual() != null && item.getPrecoAtual().compareTo(BigDecimal.ZERO) > 0)
                             ? item.getPrecoAtual()
                             : (item.getPrecoMedio() != null && item.getPrecoMedio().compareTo(BigDecimal.ZERO) > 0 ? item.getPrecoMedio() : new BigDecimal("100.00"));
@@ -208,10 +203,15 @@ public class MetaDividendoService {
 
                     item.setCotasFaltantesParaMetaTotal(cotasFaltantes);
                     item.setInvestimentoEstimadoNecessario(MoedaUtils.arredondar2Casas(investimentoEstimado));
-                    aporteTotalEstimado = aporteTotalEstimado.add(investimentoEstimado);
+
+                    if (menorAporteNecessario == null || investimentoEstimado.compareTo(menorAporteNecessario) < 0) {
+                        menorAporteNecessario = investimentoEstimado;
+                    }
                 }
             }
         }
+
+        BigDecimal aporteTotalEstimado = (menorAporteNecessario != null) ? menorAporteNecessario : BigDecimal.ZERO;
 
         MetaDTO resumoMeta = MetaDTO.builder()
                 .metaMensal(MoedaUtils.arredondar2Casas(metaMensal))

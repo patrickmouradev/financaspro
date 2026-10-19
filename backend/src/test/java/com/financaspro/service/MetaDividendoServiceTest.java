@@ -31,6 +31,7 @@ class MetaDividendoServiceTest {
     private FiiService fiiService;
     private LancamentoRepository lancamentoRepository;
     private OperacaoRepository operacaoRepository;
+    private CotacaoMercadoService cotacaoMercadoService;
     private MetaDividendoService metaDividendoService;
 
     @BeforeEach
@@ -40,7 +41,8 @@ class MetaDividendoServiceTest {
         fiiService = Mockito.mock(FiiService.class);
         lancamentoRepository = Mockito.mock(LancamentoRepository.class);
         operacaoRepository = Mockito.mock(OperacaoRepository.class);
-        metaDividendoService = new MetaDividendoService(fiiRepository, dividendoRepository, fiiService, lancamentoRepository, operacaoRepository);
+        cotacaoMercadoService = Mockito.mock(CotacaoMercadoService.class);
+        metaDividendoService = new MetaDividendoService(fiiRepository, dividendoRepository, lancamentoRepository, operacaoRepository, fiiService, cotacaoMercadoService);
     }
 
     @Test
@@ -74,4 +76,48 @@ class MetaDividendoServiceTest {
         assertEquals(new BigDecimal("11.00"), projecao.getResumoMeta().getPercentualConcluido());
         assertEquals(new BigDecimal("890.00"), projecao.getResumoMeta().getFaltaParaMetaMensal());
     }
+
+    @Test
+    void calcularProgressoEMeta_DeveCalcularAporteEstimadoIndividualParaAtingirMetaTotal() {
+        // Cenário do usuário:
+        // MXRF11 a R$ 9,34, dividendo R$ 0,08 por cota
+        // Meta R$ 1.000,00, renda atual R$ 33,94 -> falta R$ 966,06
+        // Cotas faltantes = 966.06 / 0.08 = 12075.75 -> 12076 cotas (CEILING)
+        // Aporte estimado = 12076 * 9.34 = R$ 112.789,84
+        Fii mxrf11 = FiiBuilder.umFii()
+                .comId(2L)
+                .comTicker("MXRF11")
+                .comNome("Maxi Renda")
+                .comQuantidadeCotas(new BigDecimal("424.25"))
+                .comPrecoMedio(new BigDecimal("10.00"))
+                .build();
+
+        Dividendo dMxrf = DividendoBuilder.umDividendo()
+                .comId(20L)
+                .comFii(mxrf11)
+                .comDataPagamento(LocalDate.now().minusDays(10))
+                .comValorPorCota(new BigDecimal("0.08"))
+                .comQuantidadeCotas(new BigDecimal("424.25"))
+                .comValorTotal(new BigDecimal("33.94"))
+                .build();
+
+        when(fiiRepository.findAll()).thenReturn(List.of(mxrf11));
+        when(dividendoRepository.findByFiiIdOrderByDataPagamentoDesc(eq(2L))).thenReturn(List.of(dMxrf));
+        when(cotacaoMercadoService.obterCotacaoAtual("MXRF11")).thenReturn(new BigDecimal("9.34"));
+
+        ProjecaoMetaDTO projecao = metaDividendoService.calcularProgressoEMeta(new BigDecimal("1000.00"));
+
+        assertNotNull(projecao);
+        assertEquals(new BigDecimal("33.94"), projecao.getResumoMeta().getMediaRendaMensalAtual());
+        assertEquals(new BigDecimal("966.06"), projecao.getResumoMeta().getFaltaParaMetaMensal());
+
+        ProjecaoMetaDTO.ProjecaoFiiItemDTO item = projecao.getProjecoesPorFii().get(0);
+        assertEquals("MXRF11", item.getTicker());
+        assertEquals(new BigDecimal("9.34"), item.getPrecoAtual());
+        assertEquals(new BigDecimal("0.0800"), item.getDividendoMedioPorCota());
+        assertEquals(new BigDecimal("12076"), item.getCotasFaltantesParaMetaTotal());
+        assertEquals(new BigDecimal("112789.84"), item.getInvestimentoEstimadoNecessario());
+        assertEquals(new BigDecimal("112789.84"), projecao.getAporteTotalEstimadoNecessario());
+    }
+
 }

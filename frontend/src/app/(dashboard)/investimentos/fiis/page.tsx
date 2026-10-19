@@ -117,6 +117,7 @@ export default function FiisPage() {
               <h4 className="text-2xl font-bold text-sky-700 mt-1">
                 R$ {(resumo?.mediaRendaMensalAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </h4>
+              <p className="text-[10px] text-slate-500 mt-0.5">Renda gerada pela carteira atual</p>
             </div>
 
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
@@ -124,13 +125,15 @@ export default function FiisPage() {
               <h4 className="text-2xl font-bold text-amber-600 mt-1">
                 R$ {(resumo?.faltaParaMetaMensal || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </h4>
+              <p className="text-[10px] text-slate-500 mt-0.5">Diferença para atingir a meta</p>
             </div>
 
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-xs font-semibold text-slate-400 uppercase">Aporte Estimado Faltante</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase">Menor Aporte p/ Meta (Melhor Opção)</p>
               <h4 className="text-2xl font-bold text-slate-800 mt-1">
                 R$ {(projecao?.aporteTotalEstimadoNecessario || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </h4>
+              <p className="text-[10px] text-slate-500 mt-0.5">Menor valor necessário focando no ativo mais eficiente</p>
             </div>
           </div>
 
@@ -163,8 +166,7 @@ export default function FiisPage() {
                 </span>
               </h4>
               <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
-                Calculamos o <strong>Dividend Yield sobre a cotação real de mercado</strong> e o <strong>custo em reais para gerar R$ 1,00 de renda mensal</strong>. 
-                O ativo no topo do ranking entrega a maior taxa de retorno no preço atual, sendo a melhor oportunidade de aporte.
+                Calculamos o <strong>Dividend Yield sobre a cotação real de mercado</strong> e o <strong>Aporte Estimado individual</strong>: cada linha mostra exatamente quanto investir naquele ativo sozinho para cobrir 100% da meta restante, facilitando ver onde você gasta menos para alcançar sua renda passiva.
               </p>
             </div>
           </div>
@@ -215,7 +217,9 @@ export default function FiisPage() {
                   </th>
                   <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Total Investido</th>
                   <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Renda Mensal</th>
-                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Aporte Estimado</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap" title="Investimento individual necessário neste ativo para atingir 100% da meta restante">
+                    Aporte Estimado p/ Meta
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -353,8 +357,15 @@ export default function FiisPage() {
                           <td className="px-3 py-4 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">
                             R$ {(item.rendimentoMensalAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
-                          <td className="px-3 py-4 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
-                            R$ {(item.investimentoEstimadoNecessario || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          <td className="px-3 py-4 text-right font-mono whitespace-nowrap">
+                            <div className="font-bold text-slate-900">
+                              R$ {(item.investimentoEstimadoNecessario || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
+                            {item.cotasFaltantesParaMetaTotal != null && item.cotasFaltantesParaMetaTotal > 0 && (
+                              <span className="text-[10px] text-slate-500 font-sans block">
+                                {Number(item.cotasFaltantesParaMetaTotal).toLocaleString('pt-BR')} cotas
+                              </span>
+                            )}
                           </td>
                         </tr>
 
