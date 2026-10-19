@@ -307,7 +307,7 @@ export default function FiisPage() {
                                   🥈 2º - ÓTIMA COMPRA
                                 </span>
                                 <span className="text-[11px] font-bold text-emerald-700 mt-1 whitespace-nowrap">
-                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m.
+                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m. {item.dividendYieldAnualizado ? `(${item.dividendYieldAnualizado.toFixed(1)}% a.a.)` : ''}
                                 </span>
                                 {item.custoParaUmRealRenda != null && (
                                   <span className="text-[10px] text-slate-500 font-mono whitespace-nowrap">
@@ -323,7 +323,7 @@ export default function FiisPage() {
                                   🥉 3º - BOA COMPRA
                                 </span>
                                 <span className="text-[11px] font-bold text-emerald-700 mt-1 whitespace-nowrap">
-                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m.
+                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m. {item.dividendYieldAnualizado ? `(${item.dividendYieldAnualizado.toFixed(1)}% a.a.)` : ''}
                                 </span>
                                 {item.custoParaUmRealRenda != null && (
                                   <span className="text-[10px] text-slate-500 font-mono whitespace-nowrap">
@@ -339,8 +339,13 @@ export default function FiisPage() {
                                   {rank}º - MODERADO
                                 </span>
                                 <span className="text-[11px] font-semibold text-slate-600 mt-0.5 whitespace-nowrap">
-                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m.
+                                  DY: {item.dividendYieldMensalAtual?.toFixed(2)}% a.m. {item.dividendYieldAnualizado ? `(${item.dividendYieldAnualizado.toFixed(1)}% a.a.)` : ''}
                                 </span>
+                                {item.custoParaUmRealRenda != null && (
+                                  <span className="text-[10px] text-slate-500 font-mono whitespace-nowrap">
+                                    R$ {item.custoParaUmRealRenda.toFixed(2)} p/ R$ 1 renda
+                                  </span>
+                                )}
                               </div>
                             )}
 
