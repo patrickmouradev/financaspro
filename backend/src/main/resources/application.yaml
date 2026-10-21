@@ -26,6 +26,7 @@ spring:
 
 server:
   port: ${PORT:8087}
+  forward-headers-strategy: framework
 
 jwt:
   secret: ${JWT_SECRET:dGVzdGUtY2hhdmUtand0LXNlZ3VyYS1jb20tbWluaW1vLTY0LWNhcmFjdGVyZXMtYWxlYXRvcmlvcy1maW5hbmNhc3Bybw==}

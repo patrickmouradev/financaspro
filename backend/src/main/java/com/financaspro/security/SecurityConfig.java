@@ -62,6 +62,10 @@ public class SecurityConfig {
         originPatterns.add("http://localhost:*");
         originPatterns.add("http://127.0.0.1:*");
         originPatterns.add("http://192.168.*:*");
+        originPatterns.add("https://*.duckdns.org");
+        originPatterns.add("https://*.duckdns.org:*");
+        originPatterns.add("http://*.duckdns.org");
+        originPatterns.add("http://*.duckdns.org:*");
         configuration.setAllowedOriginPatterns(originPatterns);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
