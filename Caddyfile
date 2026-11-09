@@ -3,14 +3,16 @@
 # Rede Docker: jenkins_jenkins_net
 # ============================================================
 
-financaspro.duckdns.org {
-    # Aponta para o backend Spring Boot na rede Docker
-    # Obs: 'handle /api/*' preserva o prefixo /api que os Controllers do Spring Boot utilizam (@RequestMapping("/api/..."))
+financaslocal.duckdns.org {
+    # Aponta direto para o container do backend na rede Docker
+    # (Nota: Usamos 'handle /api/*' para manter o prefixo /api que o Spring Boot espera)
     handle /api/* {
-        reverse_proxy backendfinancaspro:8087
+        reverse_proxy backendfinancaspro:8087 {
+            header_up -Origin
+        }
     }
 
-    # Aponta para o frontend Next.js na rede Docker (porta interna 3000)
+    # Aponta direto para o container do frontend na rede Docker (porta interna 3000 do Next.js)
     handle {
         reverse_proxy frontendfinancaspro:3000
     }
