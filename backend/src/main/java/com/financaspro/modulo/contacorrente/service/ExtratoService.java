@@ -25,7 +25,9 @@ import java.time.LocalDateTime;
 
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -128,6 +130,28 @@ public class ExtratoService {
         lancamentoRepository.deleteById(id);
     }
 
+    public static boolean ehInvestimento(Lancamento l) {
+        if (l == null) return false;
+        String origem = (l.getOrigem() != null) ? l.getOrigem().toUpperCase() : "";
+        String tipo = (l.getTipo() != null) ? l.getTipo().toUpperCase() : "";
+        String cat = (l.getCategoria() != null && l.getCategoria().getNome() != null)
+                ? l.getCategoria().getNome().toUpperCase() : "";
+
+        return origem.contains("CORRETAGEM")
+                || origem.contains("EXTRATO_INVESTIMENTO")
+                || origem.contains("BTG_INVESTIMENTO")
+                || origem.contains("INVESTIMENTO")
+                || tipo.equals("COMPRA_ATIVO")
+                || tipo.equals("VENDA_ATIVO")
+                || tipo.equals("DIVIDENDO")
+                || tipo.equals("RENDIMENTO")
+                || cat.contains("FUNDOS IMOBILIÁRIOS")
+                || cat.contains("AÇÕES")
+                || cat.contains("ACOES")
+                || cat.contains("RENDA FIXA")
+                || cat.contains("PROVENTOS");
+    }
+
     public ResumoMensalDTO resumoMensal(YearMonth anoMes) {
         YearMonth ym = resolverAnoMes(anoMes);
         LocalDateTime inicio = DateUtils.primeiroDiaMes(ym).atStartOfDay();
@@ -138,14 +162,40 @@ public class ExtratoService {
         BigDecimal totalGasto = BigDecimal.ZERO;
         BigDecimal totalReceita = BigDecimal.ZERO;
 
+        Map<Long, CategoriaResumoDTO> mapaCategorias = new LinkedHashMap<>();
+
         for (Lancamento l : lancamentos) {
-            if (l.getValor() != null) {
-                boolean ehReceita = (l.getCategoria() != null && "RECEITA".equalsIgnoreCase(l.getCategoria().getTipo()))
-                        || (l.getValor().compareTo(BigDecimal.ZERO) > 0);
-                if (ehReceita) {
-                    totalReceita = totalReceita.add(l.getValor().abs());
+            if (l.getValor() == null || ehInvestimento(l)) {
+                continue;
+            }
+
+            boolean ehReceita = (l.getCategoria() != null && "RECEITA".equalsIgnoreCase(l.getCategoria().getTipo()))
+                    || (l.getValor().compareTo(BigDecimal.ZERO) > 0);
+
+            BigDecimal valorAbs = l.getValor().abs();
+
+            if (ehReceita) {
+                totalReceita = totalReceita.add(valorAbs);
+            } else {
+                totalGasto = totalGasto.add(valorAbs);
+
+                Categoria cat = l.getCategoria();
+                Long catId = (cat != null) ? cat.getId() : -1L;
+                String catNome = (cat != null && cat.getNome() != null) ? cat.getNome() : "Outros";
+                String catCor = (cat != null && cat.getCor() != null) ? cat.getCor() : "#94a3b8";
+
+                CategoriaResumoDTO dto = mapaCategorias.get(catId);
+                if (dto == null) {
+                    dto = CategoriaResumoDTO.builder()
+                            .categoriaId(catId)
+                            .categoriaNome(catNome)
+                            .categoriaCor(catCor)
+                            .valorTotal(valorAbs)
+                            .percentualDoTotal(BigDecimal.ZERO)
+                            .build();
+                    mapaCategorias.put(catId, dto);
                 } else {
-                    totalGasto = totalGasto.add(l.getValor().abs());
+                    dto.setValorTotal(dto.getValorTotal().add(valorAbs));
                 }
             }
         }
@@ -159,25 +209,13 @@ public class ExtratoService {
 
         BigDecimal percentualMeta = PercentualUtils.calcularPercentual(totalGasto, metaGastos);
 
-        List<Object[]> sumCategorias = lancamentoRepository.sumByCategoriaAndPeriodo(inicio, fim);
         List<CategoriaResumoDTO> porCategoria = new ArrayList<>();
-
-        for (Object[] row : sumCategorias) {
-            Long catId = (Long) row[0];
-            String catNome = (String) row[1];
-            String catCor = (String) row[2];
-            BigDecimal catValor = MoedaUtils.arredondar2Casas((BigDecimal) row[3]);
-            BigDecimal catPerc = PercentualUtils.calcularPercentual(catValor, totalGasto);
-
-            CategoriaResumoDTO cDto = CategoriaResumoDTO.builder()
-                    .categoriaId(catId)
-                    .categoriaNome(catNome)
-                    .categoriaCor(catCor)
-                    .valorTotal(catValor)
-                    .percentualDoTotal(catPerc)
-                    .build();
-            porCategoria.add(cDto);
+        for (CategoriaResumoDTO dto : mapaCategorias.values()) {
+            dto.setValorTotal(MoedaUtils.arredondar2Casas(dto.getValorTotal()));
+            dto.setPercentualDoTotal(PercentualUtils.calcularPercentual(dto.getValorTotal(), totalGasto));
+            porCategoria.add(dto);
         }
+        porCategoria.sort((a, b) -> b.getValorTotal().compareTo(a.getValorTotal()));
 
         return ResumoMensalDTO.builder()
                 .anoMes(ym.toString())
@@ -190,9 +228,32 @@ public class ExtratoService {
                 .build();
     }
 
+    private boolean ehInvestimentoDto(LancamentoDTO l) {
+        if (l == null) return false;
+        String origem = (l.getOrigem() != null) ? l.getOrigem().toUpperCase() : "";
+        String tipo = (l.getTipo() != null) ? l.getTipo().toUpperCase() : "";
+        String cat = (l.getCategoriaNome() != null) ? l.getCategoriaNome().toUpperCase() : "";
+
+        return origem.contains("CORRETAGEM")
+                || origem.contains("EXTRATO_INVESTIMENTO")
+                || origem.contains("BTG_INVESTIMENTO")
+                || origem.contains("INVESTIMENTO")
+                || tipo.equals("COMPRA_ATIVO")
+                || tipo.equals("VENDA_ATIVO")
+                || tipo.equals("DIVIDENDO")
+                || tipo.equals("RENDIMENTO")
+                || cat.contains("FUNDOS IMOBILIÁRIOS")
+                || cat.contains("AÇÕES")
+                || cat.contains("ACOES")
+                || cat.contains("RENDA FIXA")
+                || cat.contains("PROVENTOS");
+    }
+
     public byte[] exportarPdf(YearMonth anoMes) throws Exception {
         ResumoMensalDTO resumo = resumoMensal(anoMes);
-        List<LancamentoDTO> lancamentos = listarLancamentosPorMes(anoMes);
+        List<LancamentoDTO> lancamentos = listarLancamentosPorMes(anoMes).stream()
+                .filter(l -> !ehInvestimentoDto(l))
+                .collect(Collectors.toList());
 
         StringBuilder sb = new StringBuilder();
         sb.append("Resumo do Mês: ").append(resumo.getAnoMes()).append("\n");
@@ -214,7 +275,9 @@ public class ExtratoService {
     }
 
     public byte[] exportarExcel(YearMonth anoMes) throws Exception {
-        List<LancamentoDTO> lancamentos = listarLancamentosPorMes(anoMes);
+        List<LancamentoDTO> lancamentos = listarLancamentosPorMes(anoMes).stream()
+                .filter(l -> !ehInvestimentoDto(l))
+                .collect(Collectors.toList());
 
         List<String> cabecalho = List.of("Data", "Descrição", "Categoria", "Valor", "Tipo", "Origem", "Observação");
         List<List<String>> dados = new ArrayList<>();

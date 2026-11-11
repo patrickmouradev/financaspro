@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Header';
 import { MonthSelector } from '@/components/MonthSelector';
+import { useFiltroStore } from '@/store/filtro.store';
 import api from '@/lib/axios';
 import { Download, FileSpreadsheet, TrendingUp, DollarSign, Tag, ShieldCheck, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 export default function ExtratoInvestimentoPage() {
-  const [selectedMonth, setSelectedMonth] = useState<string>('');
+  const { selectedMonth, setSelectedMonth } = useFiltroStore();
 
   const { data: lancamentosAll = [], isLoading } = useQuery({
     queryKey: ['lancamentos', selectedMonth],

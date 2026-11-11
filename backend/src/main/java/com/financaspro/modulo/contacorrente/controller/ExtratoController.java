@@ -62,7 +62,7 @@ public class ExtratoController {
 
     @GetMapping("/relatorio/pdf")
     public ResponseEntity<byte[]> exportarPdf(@RequestParam(value = "anoMes", required = false) String anoMesStr) throws Exception {
-        YearMonth ym = parseAnoMes(anoMesStr);
+        YearMonth ym = extratoService.resolverAnoMes(parseAnoMes(anoMesStr));
         byte[] pdfBytes = extratoService.exportarPdf(ym);
 
         HttpHeaders headers = new HttpHeaders();
@@ -74,7 +74,7 @@ public class ExtratoController {
 
     @GetMapping("/relatorio/excel")
     public ResponseEntity<byte[]> exportarExcel(@RequestParam(value = "anoMes", required = false) String anoMesStr) throws Exception {
-        YearMonth ym = parseAnoMes(anoMesStr);
+        YearMonth ym = extratoService.resolverAnoMes(parseAnoMes(anoMesStr));
         byte[] excelBytes = extratoService.exportarExcel(ym);
 
         HttpHeaders headers = new HttpHeaders();
@@ -91,6 +91,6 @@ public class ExtratoController {
             } catch (Exception ignored) {
             }
         }
-        return YearMonth.now();
+        return null;
     }
 }

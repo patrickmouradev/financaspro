@@ -1,12 +1,14 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/axios';
 import { Calendar } from 'lucide-react';
+import { useFiltroStore } from '@/store/filtro.store';
 
 interface MonthSelectorProps {
-  selectedMonth: string;
-  onChange: (month: string) => void;
+  selectedMonth?: string;
+  onChange?: (month: string) => void;
 }
 
 const formatarMesAno = (ym: string) => {
@@ -30,7 +32,11 @@ const formatarMesAno = (ym: string) => {
   return `${nomeMes}/${ano}`;
 };
 
-export function MonthSelector({ selectedMonth, onChange }: MonthSelectorProps) {
+export function MonthSelector({ selectedMonth: propMonth, onChange }: MonthSelectorProps) {
+  const { selectedMonth: storeMonth, setSelectedMonth: setStoreMonth } = useFiltroStore();
+
+  const activeMonth = propMonth !== undefined && propMonth !== '' ? propMonth : storeMonth;
+
   const { data: meses = [] } = useQuery({
     queryKey: ['mesesDisponiveis'],
     queryFn: async () => {
@@ -39,13 +45,30 @@ export function MonthSelector({ selectedMonth, onChange }: MonthSelectorProps) {
     },
   });
 
+  useEffect(() => {
+    if (meses.length > 0 && !activeMonth) {
+      const defaultMonth = meses[0];
+      setStoreMonth(defaultMonth);
+      if (onChange) {
+        onChange(defaultMonth);
+      }
+    }
+  }, [meses, activeMonth, onChange, setStoreMonth]);
+
+  const handleChange = (monthVal: string) => {
+    setStoreMonth(monthVal);
+    if (onChange) {
+      onChange(monthVal);
+    }
+  };
+
   return (
     <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-2 rounded-lg shadow-xs hover:border-slate-300 transition-colors">
       <Calendar className="w-4 h-4 text-sky-600 shrink-0" />
       <span className="text-xs font-medium text-slate-400">Mês:</span>
       <select
-        value={selectedMonth}
-        onChange={(e) => onChange(e.target.value)}
+        value={activeMonth}
+        onChange={(e) => handleChange(e.target.value)}
         className="bg-transparent text-sm font-semibold text-slate-700 outline-hidden cursor-pointer"
       >
         {meses.map((m: string) => (

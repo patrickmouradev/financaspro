@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Header } from '@/components/Header';
 import { MonthSelector } from '@/components/MonthSelector';
+import { useFiltroStore } from '@/store/filtro.store';
 import api from '@/lib/axios';
 import { Download, FileText, Edit2, X, Check, Tag, CreditCard, Wallet } from 'lucide-react';
 
 export default function ExtratoPage() {
-  const [selectedMonth, setSelectedMonth] = useState<string>('');
+  const { selectedMonth, setSelectedMonth } = useFiltroStore();
   const [editingLancamento, setEditingLancamento] = useState<any>(null);
   const [editForm, setEditForm] = useState<{ categoriaId: string; descricao: string; valor: string }>({
     categoriaId: '',

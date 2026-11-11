@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Header';
 import { KpiCard } from '@/components/KpiCard';
 import { MonthSelector } from '@/components/MonthSelector';
+import { useFiltroStore } from '@/store/filtro.store';
 import api from '@/lib/axios';
 import { Wallet, TrendingUp, ArrowDownRight, Building2 } from 'lucide-react';
 import {
@@ -22,7 +23,7 @@ import {
 const COLORS = ['#0284c7', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function DashboardPage() {
-  const [selectedMonth, setSelectedMonth] = useState<string>('');
+  const { selectedMonth, setSelectedMonth } = useFiltroStore();
 
   const { data: resumo } = useQuery({
     queryKey: ['resumoMensal', selectedMonth],
@@ -37,7 +38,7 @@ export default function DashboardPage() {
     if (resumo?.anoMes && !selectedMonth) {
       setSelectedMonth(resumo.anoMes);
     }
-  }, [resumo, selectedMonth]);
+  }, [resumo, selectedMonth, setSelectedMonth]);
 
   const { data: carteira } = useQuery({
     queryKey: ['carteiraInvestimentos'],
